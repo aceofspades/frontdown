@@ -1,5 +1,5 @@
-OBJS=$(patsubst %.c,%.o,$(wildcard *.c))
 TARGET=frontdown
+OBJS=$(patsubst %.c,%.o,$(wildcard *.c))
 CC=gcc
 CFLAGS=-Wall
 

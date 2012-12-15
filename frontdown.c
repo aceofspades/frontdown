@@ -11,30 +11,24 @@ void version(){
 }
 
 void usage(char *prog){
-	printf("Usage: %s [OPTIONS]\n\n", prog);
-}
-
-void args(){
+	printf("Usage: %s [OPTIONS] [JOB]\n\n", prog);
 	printf("\t-h\t--help\tprints this help\n");
 	printf("\n");
-}
-
-void support(){
 	printf("There are no bugs - just random features.\n");
 	printf("Mail them to: <nosupport@nowhere.nix>\n\n");
-	printf("(C) Copyright 2012 by Patrick Eigensatz\n\n");
+	printf("(C) Copyright 2012 by Patrick Eigensatz & Florian Wernli\n\n");
 }
+
 
 void help(int argc, char** argv){
 	version();
 	usage(argv[0]);
-	args();
-	support();
 }
 
 int main(int argc, char **argv){
+	if(argc < 2)
+		help(argc, argv);
 	
-	help(argc, argv);
 	
 	return 0;
 }

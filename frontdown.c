@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <dirent.h>
 
 #include "frontdown.h"
 
@@ -20,6 +21,33 @@ void usage(char *prog){
 }
 
 
+int listdir(){
+	struct dirent *pwd_ent;
+	DIR* pwd;
+	FILE* fl;
+
+	if((pwd=opendir("."))==NULL){
+		perror("opendir");
+		return -1;
+	}
+	
+	while((pwd_ent=readdir(pwd))){
+
+		printf("%s:\tType: ", pwd_ent->d_name);
+
+		if((fl=fopen(pwd_ent->d_name,"rb"))!=NULL){
+			printf("file\n");
+			fclose(fl);
+		}else{
+			printf("dir\n");
+		}
+	}
+
+	closedir(pwd);
+	
+	return 0;
+}
+
 void help(int argc, char** argv){
 	version();
 	usage(argv[0]);
@@ -29,6 +57,7 @@ int main(int argc, char **argv){
 	if(argc < 2)
 		help(argc, argv);
 	
+	listdir();
 	
 	return 0;
 }

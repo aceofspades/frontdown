@@ -24,7 +24,7 @@ void usage(char *prog){
 }
 
 
-int listdir(){
+int listdir(int level){
 	char path[1024]={0};
 	int i;
 
@@ -43,20 +43,34 @@ int listdir(){
 	while((pwd_ent=readdir(pwd))){
 		strcpy(&path[2], pwd_ent->d_name);
 
-		printf("%s:\n", pwd_ent->d_name);
-		stat(path, &buf);
+		if((path[2]=='.') && ( \
+			(path[3]=='\0') || ((path[3]=='.')&&(path[4]=='\0'))));
+		else{
+			for(i=0;i<level;i++)putc('-',stdout);
+			printf("> %s:\n", pwd_ent->d_name);
+			puts("------------------------------------");
+			stat(path, &buf);
 
-		printf("\tDevice ID:\t%i\n", (int)buf.st_dev);
-		printf("\tInode:\t%i\n", (int)buf.st_ino);
-		printf("\tMode:\t%i\n", (int)buf.st_mode);
-		printf("\tNlink:\t%i\n", (int)buf.st_nlink);
-		printf("\tUID:\t%i\n", (int)buf.st_uid);
-		printf("\tGID:\t%i\n", (int)buf.st_gid);
-		printf("\tSize:\t%ld\n", (long)buf.st_size);
-		printf("\tatime:\t%s", ctime(&buf.st_atime));
-		printf("\tmtime:\t%s", ctime(&buf.st_mtime));
-		printf("\tctime:\t%s\n", ctime(&buf.st_ctime));
+			printf("\t|Dev:\t%i\n", (int)buf.st_dev);
+			printf("\t|Inode:\t%i\n", (int)buf.st_ino);
+			printf("\t|Mode:\t%o\n", (int)buf.st_mode);
+			printf("\t|Nlink:\t%i\n", (int)buf.st_nlink);
+			printf("\t|UID:\t%i\n", (int)buf.st_uid);
+			printf("\t|GID:\t%i\n", (int)buf.st_gid);
+			printf("\t|Size:\t%ld\n", (long)buf.st_size);
+			printf("\t|atime:\t%s", ctime(&buf.st_atime));
+			printf("\t|mtime:\t%s", ctime(&buf.st_mtime));
+			printf("\t|ctime:\t%s\n", ctime(&buf.st_ctime));
 
+			puts("------------------------------------");
+		
+			if(S_ISDIR(buf.st_mode)){
+				chdir(path);
+				listdir(level+1);
+				chdir("..");
+			}
+		}
+		
 		for(i=2;i<1024;i++) path[i]=0;
 	}
 
@@ -74,7 +88,7 @@ int main(int argc, char **argv){
 	if(argc < 2)
 		help(argc, argv);
 	
-	listdir();
+	listdir(0);
 	
 	return 0;
 }

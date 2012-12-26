@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <dirent.h>
 #include <time.h>
 #include <sys/stat.h>
@@ -45,13 +46,13 @@ int listdir(){
 		printf("%s:\n", pwd_ent->d_name);
 		stat(path, &buf);
 
-		printf("\tDevice ID:\t%i\n", buf.st_dev);
-		printf("\tInode:\t%i\n", buf.st_ino);
-		printf("\tMode:\t%i\n", buf.st_mode);
-		printf("\tNlink:\t%i\n", buf.st_nlink);
-		printf("\tUID:\t%i\n", buf.st_uid);
-		printf("\tGID:\t%i\n", buf.st_gid);
-		printf("\tSize:\t%ld\n", buf.st_size);
+		printf("\tDevice ID:\t%i\n", (int)buf.st_dev);
+		printf("\tInode:\t%i\n", (int)buf.st_ino);
+		printf("\tMode:\t%i\n", (int)buf.st_mode);
+		printf("\tNlink:\t%i\n", (int)buf.st_nlink);
+		printf("\tUID:\t%i\n", (int)buf.st_uid);
+		printf("\tGID:\t%i\n", (int)buf.st_gid);
+		printf("\tSize:\t%ld\n", (long)buf.st_size);
 		printf("\tatime:\t%s", ctime(&buf.st_atime));
 		printf("\tmtime:\t%s", ctime(&buf.st_mtime));
 		printf("\tctime:\t%s\n", ctime(&buf.st_ctime));

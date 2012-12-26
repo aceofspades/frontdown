@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <dirent.h>
 #include <time.h>
@@ -23,33 +24,35 @@ void usage(char *prog){
 	printf("(C) Copyright 2012 by Patrick Eigensatz & Florian Wernli\n\n");
 }
 
+// Global file counter
+int n=0;
 
-int listdir(int level){
-	char path[1024]={0};
-	int i;
-
+int listdir(struct dirnode *node){		
 	struct dirent *pwd_ent;
 	struct stat buf;
 	DIR* pwd;
-	
-	path[0]='.';
-	path[1]='/';
 
-	if((pwd=opendir(path))==NULL){
+	char path[FD_PATHLEN];
+	int pathlen;
+
+	strcpy(path,node->path);
+
+	if((pwd=opendir(node->path))==NULL){
 		perror("opendir");
 		return -1;
 	}
 	
 	while((pwd_ent=readdir(pwd))){
-		strcpy(&path[2], pwd_ent->d_name);
+		strcat(node->path, pwd_ent->d_name);
 
 		if((path[2]=='.') && ( \
 			(path[3]=='\0') || ((path[3]=='.')&&(path[4]=='\0'))));
 		else{
-			for(i=0;i<level;i++)putc('-',stdout);
-			printf("> %s:\n", pwd_ent->d_name);
-			puts("------------------------------------");
+
 			stat(path, &buf);
+
+			printf("> %s:\n", path);
+			puts("\t------------------------------------");
 
 			printf("\t|Dev:\t%i\n", (int)buf.st_dev);
 			printf("\t|Inode:\t%i\n", (int)buf.st_ino);
@@ -60,18 +63,20 @@ int listdir(int level){
 			printf("\t|Size:\t%ld\n", (long)buf.st_size);
 			printf("\t|atime:\t%s", ctime(&buf.st_atime));
 			printf("\t|mtime:\t%s", ctime(&buf.st_mtime));
-			printf("\t|ctime:\t%s\n", ctime(&buf.st_ctime));
+			printf("\t|ctime:\t%s", ctime(&buf.st_ctime));
 
-			puts("------------------------------------");
+			puts("\t------------------------------------");
 		
 			if(S_ISDIR(buf.st_mode)){
-				chdir(path);
-				listdir(level+1);
-				chdir("..");
+				node->next=calloc(1,sizeof(struct dirnode));
+				node=node->next;
+				strcpy(node->path,path);
 			}
+			
+			n += 1;
 		}
-		
-		for(i=2;i<1024;i++) path[i]=0;
+
+		memset(path+2, 0, FD_PATHLEN-2);
 	}
 
 	closedir(pwd);
@@ -85,10 +90,25 @@ void help(int argc, char** argv){
 }
 
 int main(int argc, char **argv){
+	struct dirnode *node;
+	void *freewilli;
 	if(argc < 2)
 		help(argc, argv);
 	
-	listdir(0);
+	root=calloc(1,sizeof(struct dirnode));	
+	strcpy(root->path,"./");
+
+	node=root;
+	do{
+		chdir(node->path);
+		listdir(node);
+		printf("--DEBUG--\n %s --- %p\n", node->path, node->next);
+		freewilli=node;
+		node=node->next;
+		free(freewilli);
+	}while(node!=NULL);
+	
+	printf("Total %d files\n", n);
 	
 	return 0;
 }

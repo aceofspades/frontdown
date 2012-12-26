@@ -27,31 +27,35 @@ void usage(char *prog){
 // Global file counter
 int n=0;
 
-int listdir(struct dirnode *node){		
+struct dirnode *listdir(struct dirnode *origin, struct dirnode *node){		
 	struct dirent *pwd_ent;
 	struct stat buf;
 	DIR* pwd;
-
+	
 	char path[FD_PATHLEN];
-	int pathlen;
 
-	strcpy(path,node->path);
-
-	if((pwd=opendir(node->path))==NULL){
+	if((pwd=opendir(origin->path))==NULL){
 		perror("opendir");
-		return -1;
+		return NULL;
 	}
 	
 	while((pwd_ent=readdir(pwd))){
-		strcat(node->path, pwd_ent->d_name);
-
-		if((path[2]=='.') && ( \
-			(path[3]=='\0') || ((path[3]=='.')&&(path[4]=='\0'))));
+		
+		if((pwd_ent->d_name[0]=='.') && ( \
+			(pwd_ent->d_name[1]=='\0') || \
+			((pwd_ent->d_name[1]=='.')&&(pwd_ent->d_name[2]=='\0'))));
 		else{
 
-			stat(path, &buf);
+			strcpy(path,origin->path);
+			strcat(path,"/");
+			strcat(path, pwd_ent->d_name);
 
-			printf("> %s:\n", path);
+			if(stat(path, &buf)<0){
+				printf("FAILED AT: %s \n\t", path);
+				perror("stat");
+			}
+
+			printf("> %s/%s:\n", origin->path, pwd_ent->d_name);
 			puts("\t------------------------------------");
 
 			printf("\t|Dev:\t%i\n", (int)buf.st_dev);
@@ -68,20 +72,18 @@ int listdir(struct dirnode *node){
 			puts("\t------------------------------------");
 		
 			if(S_ISDIR(buf.st_mode)){
+				printf("--DEBUG--\nFound dir: %s\n", pwd_ent->d_name);
 				node->next=calloc(1,sizeof(struct dirnode));
 				node=node->next;
-				strcpy(node->path,path);
+				strcpy(node->path, path);
 			}
-			
 			n += 1;
 		}
-
-		memset(path+2, 0, FD_PATHLEN-2);
 	}
 
 	closedir(pwd);
 	
-	return 0;
+	return node;
 }
 
 void help(int argc, char** argv){
@@ -90,23 +92,27 @@ void help(int argc, char** argv){
 }
 
 int main(int argc, char **argv){
+	if((argc < 2)){
+		help(argc, argv);
+		return -1;
+	}
+
+
 	struct dirnode *node;
 	void *freewilli;
-	if(argc < 2)
-		help(argc, argv);
-	
-	root=calloc(1,sizeof(struct dirnode));	
-	strcpy(root->path,"./");
 
+	root=calloc(1,sizeof(struct dirnode));	
+	strcpy(root->path, argv[1]);
 	node=root;
+
 	do{
-		chdir(node->path);
-		listdir(node);
-		printf("--DEBUG--\n %s --- %p\n", node->path, node->next);
-		freewilli=node;
-		node=node->next;
+		printf("--DEBUG--\n %s --- %p\n", root->path, root->next);
+		node=listdir(root, node);
+
+		freewilli=root;
+		root=root->next;
 		free(freewilli);
-	}while(node!=NULL);
+	}while((node!=NULL)&&(root!=NULL));
 	
 	printf("Total %d files\n", n);
 	

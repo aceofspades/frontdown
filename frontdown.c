@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include <time.h>
+#include <sys/stat.h>
 
 #include "frontdown.h"
 
@@ -22,25 +24,39 @@ void usage(char *prog){
 
 
 int listdir(){
-	struct dirent *pwd_ent;
-	DIR* pwd;
-	FILE* fl;
+	char path[1024]={0};
+	int i;
 
-	if((pwd=opendir("."))==NULL){
+	struct dirent *pwd_ent;
+	struct stat buf;
+	DIR* pwd;
+	
+	path[0]='.';
+	path[1]='/';
+
+	if((pwd=opendir(path))==NULL){
 		perror("opendir");
 		return -1;
 	}
 	
 	while((pwd_ent=readdir(pwd))){
+		strcpy(&path[2], pwd_ent->d_name);
 
-		printf("%s:\tType: ", pwd_ent->d_name);
+		printf("%s:\n", pwd_ent->d_name);
+		stat(path, &buf);
 
-		if((fl=fopen(pwd_ent->d_name,"rb"))!=NULL){
-			printf("file\n");
-			fclose(fl);
-		}else{
-			printf("dir\n");
-		}
+		printf("\tDevice ID:\t%i\n", buf.st_dev);
+		printf("\tInode:\t%i\n", buf.st_ino);
+		printf("\tMode:\t%i\n", buf.st_mode);
+		printf("\tNlink:\t%i\n", buf.st_nlink);
+		printf("\tUID:\t%i\n", buf.st_uid);
+		printf("\tGID:\t%i\n", buf.st_gid);
+		printf("\tSize:\t%ld\n", buf.st_size);
+		printf("\tatime:\t%s", ctime(&buf.st_atime));
+		printf("\tmtime:\t%s", ctime(&buf.st_mtime));
+		printf("\tctime:\t%s\n", ctime(&buf.st_ctime));
+
+		for(i=2;i<1024;i++) path[i]=0;
 	}
 
 	closedir(pwd);

@@ -18,9 +18,10 @@ int fd_scandir(const char* path){
 	do{
 		if(anakin_filewalker(node, node->sub)==NULL){
 			printf("--DEBUG--\nNO DIRS IN PWD\n");
-			freewilli=node;
 
 			next_dir:
+				
+				freewilli=node;
 				node=node->next;
 				if(node==NULL){
 					node=freewilli->top;
@@ -29,8 +30,11 @@ int fd_scandir(const char* path){
 						perror("chdir");
 						return -1;
 					}
-					goto next_dir;
-				}
+
+			goto next_dir;
+
+
+			}
 			free(freewilli);
 
 			if(chdir("..")<0){

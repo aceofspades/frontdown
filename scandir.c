@@ -6,7 +6,7 @@ int n=0;
 void upload(const char *source, char *relpath, char *name, long long timestamp){}
 
 
-int fd_scandir(const char* path, long long timestamp, struct exclude_list *excludes){
+int fd_scandir(const char* path, long long timestamp, struct exclude_list *excludes, struct exclude_list *dir_excludes){
 	char pathbuf[65536]={0};
 	char *dirpointer[128];
 	int dirptrc=0;
@@ -27,7 +27,7 @@ int fd_scandir(const char* path, long long timestamp, struct exclude_list *exclu
 	node=root;
 
 	do{
-		if(anakin_filewalker(node, node->sub, path, &pathbuf[0], timestamp, excludes)==NULL){
+		if(anakin_filewalker(node, node->sub, path, &pathbuf[0], timestamp, excludes, dir_excludes)==NULL){
 
 			next_dir:
 
@@ -96,7 +96,7 @@ int filter(char *name, long long timestamp, long long time, struct exclude_list 
 	return 0;
 }
 
-struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, const char *source, char *cpath, long long time, struct exclude_list *excludes){		
+struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, const char *source, char *cpath, long long time, struct exclude_list *excludes, struct exclude_list *dir_excludes){		
 	struct dirent *pwd_ent;
 	struct stat buf;
 	DIR* pwd;
@@ -149,6 +149,30 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, co
 //				if(&buf.st_atime)
 
 				if(S_ISDIR(buf.st_mode)){
+					
+					struct exclude_list *exclude_walker;
+					int i,offs;
+					exclude_walker=dir_excludes;
+					
+					while(exclude_walker!=NULL){
+						i=0;						
+								printf("EXCLUDE: %s\n", exclude_walker->exclude_path);
+						if(strlen(exclude_walker->exclude_path)+1==strlen(pwd_ent->d_name)+strlen(cpath)){
+								printf("EXCLUDE: %s\n", exclude_walker->exclude_path);
+							while((exclude_walker->exclude_path[i]-cpath[i+2])==0)i++;
+								printf("EXCLUDE: %s CPATH %d %d %s\n", exclude_walker->exclude_path,i+1,cpath[i+1],cpath);
+							if(cpath[i+1]=='\0'){
+								printf("EXCLUDE: %s\n", exclude_walker->exclude_path);
+								offs=++i;
+								while(((exclude_walker->exclude_path[i]-pwd_ent->d_name[i-offs])==0)&&\
+								(exclude_walker->exclude_path[i]!='\0'))i++;
+								if(exclude_walker->exclude_path[i]!='\0') goto ignore_dir;
+							}
+						}
+						exclude_walker=exclude_walker->next;
+					}
+					
+					
 					if(leia!=NULL){
 						leia->next=calloc(1,sizeof(struct dirnode));
 						leia=leia->next;
@@ -158,6 +182,7 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, co
 					leia->top=luke;
 					strcpy(leia->path, path);
 				}
+				ignore_dir:
 				n += 1;
 			}
 		}

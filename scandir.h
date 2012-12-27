@@ -24,8 +24,8 @@ struct dirnode{
 	struct dirnode *next;
 };
 
-int fd_scandir(const char* path, long long timestamp, struct exclude_list *excludes);
-struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, const char *source, char *cpath, long long time, struct exclude_list *excludes);
+int fd_scandir(const char* path, long long timestamp, struct exclude_list *excludes, struct exclude_list *dir_excludes);
+struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, const char *source, char *cpath, long long time, struct exclude_list *excludes, struct exclude_list *dir_excludes);
 void upload(const char *source, char *relpath, char *name, long long timestamp);
 
 

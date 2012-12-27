@@ -58,7 +58,7 @@ int main(int argc, char **argv){
 	printf("Last backup:            %s\n", config.last_backup==0?"Never before":ctime((time_t*)&config.last_backup));
 	printf("========================================================================\n\n");
 	
-	fd_scandir(config.source, config.last_backup, config.excludes);
+	fd_scandir(config.source, config.last_backup, config.file_excludes, config.dir_excludes);
 	
 	return 0;
 }

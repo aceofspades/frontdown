@@ -12,6 +12,10 @@
 #ifndef __SCANDIR_H__
 #define __SCANDIR_H__
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 struct dirnode{
 	char path[FD_PATHLEN];	
 	struct dirnode *sub;

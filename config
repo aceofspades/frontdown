@@ -1,4 +1,4 @@
-source		/home/patrick
+source		/home/
 destination	/tmp
 hidden		yes
 threads		4

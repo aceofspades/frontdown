@@ -23,6 +23,8 @@ int fd_scandir(const char* path){
 				freewilli=node;
 				node=node->next;
 				
+				if(freewilli->top==NULL) break;
+
 				freewilli->top->sub=node;
 
 				if(node==NULL){

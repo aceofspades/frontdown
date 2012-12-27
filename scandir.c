@@ -17,28 +17,16 @@ int fd_scandir(const char* path){
 
 	do{
 		if(anakin_filewalker(node, node->sub)==NULL){
-			printf("[--DEBUG-NO-SUBDIR--\n");
-			
-			freewilli=root;
-			
-			while(freewilli!=NULL){
-				puts(freewilli->path);
-				freewilli=freewilli->sub;
-			}
 
 			next_dir:
-				
+
 				freewilli=node;
 				node=node->next;
-				
-				printf("TRY NEXT PATH: %s\n",node->path);
 				
 				freewilli->top->sub=node;
 
 				if(node==NULL){
 					node=freewilli->top;
-
-					printf("TRY PARENT PATH: %s\n", node->path);
 
 					free(freewilli);
 					
@@ -61,8 +49,6 @@ int fd_scandir(const char* path){
 				return -1;
 			}
 
-			printf("--DEBUG-NO-SUBDIR--]\n");
-
 		}else{
 			node=node->sub;
 		}
@@ -76,8 +62,6 @@ int fd_scandir(const char* path){
 	
 	printf("Total %d files\n", n);
 
-	
-	
 	chdir(orig_dir);
 	return 0; 
 }
@@ -108,7 +92,7 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia){
 				perror("stat");
 			} else {
 
-//				printf("%s/%s:\n", luke->path, pwd_ent->d_name);
+				printf("%s/%s\n", luke->path, pwd_ent->d_name);
 
 {
 	//			puts("\t------------------------------------");

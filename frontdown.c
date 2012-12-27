@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <string.h>
 #include <dirent.h>
@@ -17,7 +18,7 @@ void version(void){
 
 void usage(void){
 	printf("Usage: frontdown [OPTIONS] \n\n");
-	printf("\t-h --help          Prints this help\n");
+	printf("\t-h --help          Print this help\n");
 	printf("\t-s --source        Backup Source\n");
 	printf("\t-d --destination   Backup Destination\n");
 	printf("\t-H --hidden        Include files starting with .\n");
@@ -101,11 +102,13 @@ int main(int argc, char **argv){
 	parse_options(argc, argv);
 	
 	// Display parsed options
-	printf("===================== CONFIG =====================\n");
+	printf("================================ CONFIG ================================\n");
+	printf("Configuration File:     %s\n", strlen(config.conf)==0?"None":config.conf);
 	printf("Source:                 %s\n", config.source);
 	printf("Destination:            %s\n", config.destination);
 	printf("Threads:                %d\n", config.threads);
 	printf("Include hidden Files:   %s\t\n", config.hidden==0?"no":"yes");
+	printf("========================================================================\n\n");
 	
 
 	struct dirnode *node;

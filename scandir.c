@@ -86,7 +86,11 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia){
 		else{
 			strcpy(path, pwd_ent->d_name);
 
+		#ifdef WIN32
 			if(stat(path, &buf)<0){
+		#else
+			if(lstat(path, &buf)<0){
+		#endif
 				perror("stat");
 			} else {
 

@@ -2,7 +2,11 @@
 
 int n=0;
 
-int fd_scandir(const char* path, long long timestamp, struct bucket *buck, size_t n_bucks){
+
+void upload(const char *source, char *relpath, char *name, long long timestamp){}
+
+
+int fd_scandir(const char* path, long long timestamp, struct exclude_list *excludes){
 	char pathbuf[65536]={0};
 	char *dirpointer[128];
 	int dirptrc=0;
@@ -23,7 +27,7 @@ int fd_scandir(const char* path, long long timestamp, struct bucket *buck, size_
 	node=root;
 
 	do{
-		if(anakin_filewalker(node, node->sub, &pathbuf[0], timestamp)==NULL){
+		if(anakin_filewalker(node, node->sub, path, &pathbuf[0], timestamp, excludes)==NULL){
 
 			next_dir:
 
@@ -85,7 +89,14 @@ int fd_scandir(const char* path, long long timestamp, struct bucket *buck, size_
 	return 0; 
 }
 
-struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, char *cpath, long long time){		
+
+int filter(char *name, long long timestamp, long long time, struct exclude_list *excludes){
+	if(time>timestamp)return -1;
+	
+	return 0;
+}
+
+struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, const char *source, char *cpath, long long time, struct exclude_list *excludes){		
 	struct dirent *pwd_ent;
 	struct stat buf;
 	DIR* pwd;
@@ -113,8 +124,11 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, ch
 				perror("stat");
 			} else {
 
-				printf("%s/%s\n", cpath, pwd_ent->d_name);
 
+				if(filter(pwd_ent->d_name, buf.st_mtime, time, excludes)==0){
+					printf("%s/%s\n", cpath, pwd_ent->d_name);
+					upload(source, cpath, pwd_ent->d_name, buf.st_mtime);
+				}
 {
 	//			puts("\t------------------------------------");
 	//

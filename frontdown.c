@@ -58,8 +58,7 @@ int main(int argc, char **argv){
 	printf("Last backup:            %s\n", config.last_backup==0?"Never before":ctime((time_t*)&config.last_backup));
 	printf("========================================================================\n\n");
 	
-	struct bucket buck[FD_BUCKETSIZE];
-	fd_scandir(config.source, config.last_backup, buck, FD_BUCKETSIZE);
+	fd_scandir(config.source, config.last_backup, config.excludes);
 	
 	return 0;
 }

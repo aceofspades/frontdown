@@ -19,8 +19,11 @@ void parse_options(int argc, char **argv){
 		{0, 0, 0, 0}
 	};
 	int opt, option_index=0;
-	config.hidden  = 0;
-	config.threads = 1;
+	
+	// Defaults
+	config.hidden      = 0;
+	config.threads     = 1;
+	config.last_backup = 0;
 
 	char s=0, d=0, c=0;
 

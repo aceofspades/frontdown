@@ -38,9 +38,14 @@ void help(){
 }
 
 int main(int argc, char **argv){
+	// Initialize exclude lists
+	config.file_excludes = calloc(1, sizeof(struct exclude_list));
+	config.dir_excludes = calloc(1, sizeof(struct exclude_list));
+	
+	latest_file_exclude = config.file_excludes;
+	latest_dir_exclude = config.dir_excludes;
+	
 	// Parse command line options
-	config.excludes = calloc(1, sizeof(struct exclude_list));
-	latest_exclude = config.excludes;
 	parse_options(argc, argv);
 	
 	// Display parsed options

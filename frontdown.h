@@ -9,7 +9,9 @@ struct exclude_list{
 	char exclude_path[16384];
 	struct exclude_list *next;
 };
-struct exclude_list *latest_exclude;
+struct exclude_list *latest_file_exclude;
+struct exclude_list *latest_dir_exclude;
+
 
 struct{
 	char source[16384];
@@ -17,7 +19,9 @@ struct{
 	
 	unsigned int threads;
 	char hidden;
-	struct exclude_list *excludes;
+	
+	struct exclude_list *file_excludes;
+	struct exclude_list *dir_excludes;
 	
 	char conf[16384];
 	long long last_backup;

@@ -16,7 +16,8 @@ void parse_options(int argc, char **argv){
 		{"hidden", no_argument, 0, 'H'},
 		{"help", no_argument, 0, 'h'},
 		{"conf", required_argument, 0, 'c'},
-		{"exclude", required_argument, 0, 'e'},
+		{"exclude-file", required_argument, 0, 'e'},
+		{"exclude-directory", required_argument, 0, 'E'},
 		{0, 0, 0, 0}
 	};
 	int opt, option_index=0;
@@ -29,7 +30,7 @@ void parse_options(int argc, char **argv){
 	char s=0, d=0, c=0;
 
 	while(1){
-		opt = getopt_long(argc, argv, "s:d:t:Hhc:", command_options, &option_index);
+		opt = getopt_long(argc, argv, "s:d:t:Hhc:e:E:", command_options, &option_index);
 		if(opt == -1)
 			break;
 		
@@ -55,8 +56,13 @@ void parse_options(int argc, char **argv){
 			c=1;
 			
 		} else if(opt == 'e'){
-			strncpy(latest_exclude->exclude_path, optarg, 16383);
-			latest_exclude->next = calloc(1, sizeof(struct exclude_list));
+			strncpy(latest_file_exclude->exclude_path, optarg, 16383);
+			latest_file_exclude->next = calloc(1, sizeof(struct exclude_list));
+			latest_file_exclude = latest_file_exclude->next;
+		} else if(opt == 'E'){
+			strncpy(latest_dir_exclude->exclude_path, optarg, 16383);
+			latest_dir_exclude->next = calloc(1, sizeof(struct exclude_list));
+			latest_dir_exclude = latest_dir_exclude->next;
 		} else{
 			abort();
 		}

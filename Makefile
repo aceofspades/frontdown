@@ -1,7 +1,7 @@
 TARGET=frontdown
 OBJS=$(patsubst %.c,%.o,$(wildcard *.c))
 CC=gcc
-CFLAGS=-Wall -static -g
+CFLAGS=-Wall -static -g -O99
 
 all: $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET)

@@ -1,37 +1,55 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <dirent.h>
+#include <time.h>
+#include <sys/stat.h>
 
 #include "frontdown.h"
 #include "scandir.h"
 
-void version(){
+void version(void){
 	printf("\nFrontdown %s\n", FD_VERSION);
 	#ifdef __GNUC__
 		printf("Compiled: %s %s with gcc %d.%d.%d\n\n", __DATE__, __TIME__, __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 	#endif	
 }
 
-void usage(char *prog){
-	printf("Usage: %s [OPTIONS]\n\n", prog);
-	printf("\t-h\t--help\tprints this help\n");
+void usage(void){
+	printf("Usage: frontdown [OPTIONS] \n\n");
+	printf("\t-h --help          Print this help\n");
+	printf("\t-s --source        Backup Source\n");
+	printf("\t-d --destination   Backup Destination\n");
+	printf("\t-H --hidden        Include files starting with .\n");
+	printf("\t-c --conf          Configuration file\n");
+	
 	printf("\n");
 	printf("There are no bugs - just random features.\n");
 	printf("Mail them to: <nosupport@nowhere.nix>\n\n");
 	printf("(C) Copyright 2012 by Patrick Eigensatz & Florian Wernli\n\n");
 }
 
-void help(int argc, char** argv){
+
+void help(){
 	version();
-	usage(argv[0]);
+	usage();
 }
 
 int main(int argc, char **argv){
-	if((argc < 2)){
-		help(argc, argv);
-		return -1;
-	}
+	// Parse command line options
+	parse_options(argc, argv);
 	
-	fd_scandir(argv[1]);
+	// Display parsed options
+	printf("================================ CONFIG ================================\n");
+	printf("Configuration File:     %s\n", strlen(config.conf)==0?"None":config.conf);
+	printf("Source:                 %s\n", config.source);
+	printf("Destination:            %s\n", config.destination);
+	printf("Threads:                %d\n", config.threads);
+	printf("Include hidden Files:   %s\t\n", config.hidden==0?"no":"yes");
+	printf("========================================================================\n\n");
+	
+	fd_scandir(config.source);
 	
 	return 0;
 }

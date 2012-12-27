@@ -1,4 +1,4 @@
-TARGET=frontdown
+TARGET=frontdown-
 OBJS=$(patsubst %.c,%.o,$(wildcard *.c))
 CC=gcc
 CFLAGS=-Wall -static -g -lpthread

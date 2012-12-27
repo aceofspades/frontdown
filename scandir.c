@@ -149,27 +149,36 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, co
 //				if(&buf.st_atime)
 
 				if(S_ISDIR(buf.st_mode)){
-					
-					struct exclude_list *exclude_walker;
 					int i,offs;
+					struct exclude_list *exclude_walker;
+
 					exclude_walker=dir_excludes;
 					
 					while(exclude_walker!=NULL){
-						i=0;						
-								printf("EXCLUDE: %s\n", exclude_walker->exclude_path);
-						if(strlen(exclude_walker->exclude_path)+1==strlen(pwd_ent->d_name)+strlen(cpath)){
-								printf("EXCLUDE: %s\n", exclude_walker->exclude_path);
-							while((exclude_walker->exclude_path[i]-cpath[i+2])==0)i++;
-								printf("EXCLUDE: %s CPATH %d %d %s\n", exclude_walker->exclude_path,i+1,cpath[i+1],cpath);
-							if(cpath[i+1]=='\0'){
-								printf("EXCLUDE: %s\n", exclude_walker->exclude_path);
-								offs=++i;
-								while(((exclude_walker->exclude_path[i]-pwd_ent->d_name[i-offs])==0)&&\
-								(exclude_walker->exclude_path[i]!='\0'))i++;
-								if(exclude_walker->exclude_path[i]!='\0') goto ignore_dir;
-							}
+						if(strlen(cpath)<2){ //Still in root not ./ created
+							i=offs=0;
+						}else{ //filter directory
+							offs=2;
+							i=0;
+							while(((cpath[i+offs]^exclude_walker->exclude_path[i])==0)&&
+								(cpath[i+offs]!='\0'))i++;
+
+							if(cpath[i+offs]!='\0')	goto no_excl_match;
+
+							i++;
+							offs=i;
 						}
+						
+						while(((pwd_ent->d_name[i-offs]^exclude_walker->exclude_path[i])==0)&&
+							(pwd_ent->d_name[i-offs]!='\0')&&((exclude_walker->exclude_path[i])!='\0'))
+							i++;
+						
+						if((pwd_ent->d_name[i-offs]=='\0')&&((exclude_walker->exclude_path[i])=='\0'))goto ignore_dir;
+						
+
+					no_excl_match:
 						exclude_walker=exclude_walker->next;
+
 					}
 					
 					

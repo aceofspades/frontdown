@@ -37,6 +37,7 @@ int get_indexfile(char *source){
 		curl_easy_setopt(curl, CURLOPT_URL, source);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, filewrite);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &downloadfile);
+		//~ curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 		
 		result = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);

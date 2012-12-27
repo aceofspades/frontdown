@@ -9,6 +9,7 @@
 #include "frontdown.h"
 #include "scandir.h"
 #include "fd_curl.h"
+#include "communication.h"
 
 void version(void){
 	printf("\nFrontdown %s\n", FD_VERSION);
@@ -57,6 +58,14 @@ int main(int argc, char **argv){
 	printf("Include hidden Files:   %s\n", config.hidden==0?"no":"yes");
 	printf("Last backup:            %s\n", config.last_backup==0?"Never before":ctime((time_t*)&config.last_backup));
 	printf("========================================================================\n\n");
+	
+	
+	// Get index.db
+	char indexpath[16384];
+	strcpy(indexpath, config.destination);
+	strcat(indexpath, "index.db");
+	
+	get_indexfile(indexpath);
 	
 	fd_scandir(config.source, config.last_backup, config.file_excludes, config.dir_excludes);
 	

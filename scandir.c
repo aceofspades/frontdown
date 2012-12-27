@@ -2,7 +2,11 @@
 
 int n=0;
 
-int fd_scandir(const char* path){
+int fd_scandir(const char* path, long long timestamp, struct bucket *buck, size_t n_bucks){
+	char pathbuf[65536]={0};
+	char *dirpointer[128];
+	int dirptrc=0;
+	
 	char *orig_dir=get_current_dir_name();
 	if(chdir(path)<0){
 		perror("chdir");
@@ -13,10 +17,13 @@ int fd_scandir(const char* path){
 
 	root=calloc(1,sizeof(struct dirnode));	
 	strcpy(root->path, ".");
+	pathbuf[0]='.';
+	dirpointer[dirptrc]=&pathbuf[1];
+	
 	node=root;
 
 	do{
-		if(anakin_filewalker(node, node->sub)==NULL){
+		if(anakin_filewalker(node, node->sub, &pathbuf[0], timestamp)==NULL){
 
 			next_dir:
 
@@ -38,18 +45,21 @@ int fd_scandir(const char* path){
 						perror("chdir");
 						return -1;
 					}
-
+					dirptrc--;
+					*dirpointer[dirptrc]='\0';
+					
 			goto next_dir;
 				
 				}
-			
-			
+						
 			free(freewilli);
 
 			if(chdir("..")<0){
 				perror("chdir");
 				return -1;
 			}
+			dirptrc--;
+			*dirpointer[dirptrc]='\0';
 
 		}else{
 			node=node->sub;
@@ -60,6 +70,13 @@ int fd_scandir(const char* path){
 			puts(node->path);
 			return -1;
 		}
+
+		dirptrc++;
+		*dirpointer[dirptrc-1]='/';
+		memcpy(dirpointer[dirptrc-1]+1, node->path, strlen(node->path));
+		dirpointer[dirptrc]=dirpointer[dirptrc-1]+1+strlen(node->path);
+		*dirpointer[dirptrc]='\0';
+
 	}while(node->top!=NULL);
 	
 	printf("Total %d files\n", n);
@@ -68,7 +85,7 @@ int fd_scandir(const char* path){
 	return 0; 
 }
 
-struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia){		
+struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, char *cpath, long long time){		
 	struct dirent *pwd_ent;
 	struct stat buf;
 	DIR* pwd;
@@ -96,7 +113,7 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia){
 				perror("stat");
 			} else {
 
-				printf("%s/%s\n", luke->path, pwd_ent->d_name);
+				printf("%s/%s\n", cpath, pwd_ent->d_name);
 
 {
 	//			puts("\t------------------------------------");
@@ -113,7 +130,9 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia){
 	//			printf("\t|ctime:\t%s", ctime(&buf.st_ctime));
 	//
 	//			puts("\t------------------------------------");
-}		
+}
+				
+//				if(&buf.st_atime)
 
 				if(S_ISDIR(buf.st_mode)){
 					if(leia!=NULL){

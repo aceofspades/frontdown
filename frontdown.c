@@ -8,12 +8,13 @@
 
 #include "frontdown.h"
 #include "scandir.h"
+#include "fd_curl.h"
 
 void version(void){
 	printf("\nFrontdown %s\n", FD_VERSION);
 	#ifdef __GNUC__
 		printf("Compiled: %s %s with gcc %d.%d.%d\n\n", __DATE__, __TIME__, __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
-	#endif	
+	#endif
 }
 
 void usage(void){
@@ -47,10 +48,11 @@ int main(int argc, char **argv){
 	printf("Destination:            %s\n", config.destination);
 	printf("Threads:                %d\n", config.threads);
 	printf("Include hidden Files:   %s\n", config.hidden==0?"no":"yes");
-	printf("Last backup:            %s\n", config.last_backup==0?"Never before":ctime(&config.last_backup));
+	printf("Last backup:            %s\n", config.last_backup==0?"Never before":ctime((time_t*)&config.last_backup));
 	printf("========================================================================\n\n");
 	
-	fd_scandir(config.source);
+	struct bucket buck[FD_BUCKETSIZE];
+	fd_scandir(config.source, config.last_backup, buck, FD_BUCKETSIZE);
 	
 	return 0;
 }

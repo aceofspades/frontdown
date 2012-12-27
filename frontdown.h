@@ -3,7 +3,7 @@
 
 #define FD_VERSION "0.1"
 #define FD_PATHLEN 512
-
+#define FD_BUCKETSIZE 256
 
 struct exclude_list{
 	char *exclude_path;

@@ -39,6 +39,8 @@ void help(){
 
 int main(int argc, char **argv){
 	// Parse command line options
+	config.excludes = calloc(1, sizeof(struct exclude_list));
+	latest_exclude = config.excludes;
 	parse_options(argc, argv);
 	
 	// Display parsed options

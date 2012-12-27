@@ -92,17 +92,22 @@ void help(int argc, char** argv){
 }
 
 int main(int argc, char **argv){
-	if((argc < 2)){
-		help(argc, argv);
-		return -1;
-	}
-
+	// Parse command line options
+	parse_options(argc, argv);
+	
+	// Display parsed options
+	printf("=====================CONFIG =====================\n");
+	printf("Source:                 %s\n", config.source);
+	printf("Destination:            %s\n", config.destination);
+	printf("Threads:                %d\n", config.threads);
+	printf("Include hidden Files:   %s\t\n", config.hidden==0?"no":"yes");
+	
 
 	struct dirnode *node;
 	void *freewilli;
 
-	root=calloc(1,sizeof(struct dirnode));	
-	strcpy(root->path, argv[1]);
+	root=calloc(1, sizeof(struct dirnode));	
+	strcpy(root->path, config.source);
 	node=root;
 
 	do{

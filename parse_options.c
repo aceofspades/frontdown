@@ -16,6 +16,7 @@ void parse_options(int argc, char **argv){
 		{"hidden", no_argument, 0, 'H'},
 		{"help", no_argument, 0, 'h'},
 		{"conf", required_argument, 0, 'c'},
+		{"exclude", required_argument, 0, 'e'},
 		{0, 0, 0, 0}
 	};
 	int opt, option_index=0;
@@ -51,8 +52,11 @@ void parse_options(int argc, char **argv){
 				fprintf(stderr, "Error parsing configuration file\n");
 				abort();
 			}
-			
 			c=1;
+			
+		} else if(opt == 'e'){
+			strncpy(latest_exclude->exclude_path, optarg, 16383);
+			latest_exclude->next = calloc(1, sizeof(struct exclude_list));
 		} else{
 			abort();
 		}

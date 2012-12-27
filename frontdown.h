@@ -6,9 +6,10 @@
 #define FD_BUCKETSIZE 256
 
 struct exclude_list{
-	char *exclude_path;
+	char exclude_path[16384];
 	struct exclude_list *next;
 };
+struct exclude_list *latest_exclude;
 
 struct{
 	char source[16384];

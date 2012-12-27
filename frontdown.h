@@ -23,10 +23,12 @@ struct{
 	unsigned int threads;
 	char hidden;
 	struct exclude_list *excludes;
+	char conf[16384];
 } config;
 
 
 extern void parse_options(int argc, char **argv);
+extern void help(void);
 
 #endif
 	

@@ -74,7 +74,6 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia){
 	char path[FD_PATHLEN]={0};
 
 	if((pwd=opendir("."))==NULL){
-		printf("FAILED OPENDIR AT: %s \n", luke->path);
 		perror("opendir");
 		return leia;
 	}
@@ -88,7 +87,6 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia){
 			strcpy(path, pwd_ent->d_name);
 
 			if(stat(path, &buf)<0){
-				printf("FAILED STAT AT: %s \n", path);
 				perror("stat");
 			} else {
 

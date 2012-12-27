@@ -5,6 +5,7 @@
 #include <errno.h>
 
 #include "frontdown.h"
+#include "parser.h"
 
 
 void parse_options(int argc, char **argv){
@@ -43,17 +44,21 @@ void parse_options(int argc, char **argv){
 			exit(0);
 		} else if(opt == 'c'){
 			strncpy(config.conf, optarg, 16383);
-			// TODO parse config
+			if(!parse_config()){
+				fprintf(stderr, "Error parsing configuration file\n");
+				abort();
+			}
+			
 			c=1;
 		} else{
-			exit(1);
+			abort();
 		}
 	}
 	
 	if(!(c || (s && d))){
 		errno = EINVAL;
 		perror("Need configuration file or source and destination");
-		exit(1);
+		abort();
 	}
 	
 	if(optind < argc){

@@ -13,9 +13,11 @@ struct exclude_list{
 struct{
 	char source[16384];
 	char destination[16384];
+	
 	unsigned int threads;
 	char hidden;
 	struct exclude_list *excludes;
+	
 	char conf[16384];
 } config;
 

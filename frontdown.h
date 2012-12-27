@@ -19,6 +19,7 @@ struct{
 	struct exclude_list *excludes;
 	
 	char conf[16384];
+	long long last_backup;
 } config;
 
 

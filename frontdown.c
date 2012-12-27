@@ -46,7 +46,8 @@ int main(int argc, char **argv){
 	printf("Source:                 %s\n", config.source);
 	printf("Destination:            %s\n", config.destination);
 	printf("Threads:                %d\n", config.threads);
-	printf("Include hidden Files:   %s\t\n", config.hidden==0?"no":"yes");
+	printf("Include hidden Files:   %s\n", config.hidden==0?"no":"yes");
+	printf("Last backup:            %s\n", config.last_backup==0?"Never before":ctime(&config.last_backup));
 	printf("========================================================================\n\n");
 	
 	fd_scandir(config.source);

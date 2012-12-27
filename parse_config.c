@@ -40,6 +40,14 @@ int parse_config(void){
 	}
 	config.hidden = strcmp(test_ptr, "yes")==0?1:0;
 	
+	// optional
+	test_ptr = search_for_key("lastbackup", 0);
+	if(test_ptr != NULL){
+		config.last_backup = atoi(test_ptr);
+		printf(">>%d<<\n", config.last_backup);
+	}
+	
+	
 	// Free used memory
 	search_destroy();
 	

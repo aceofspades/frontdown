@@ -17,24 +17,43 @@ int fd_scandir(const char* path){
 
 	do{
 		if(anakin_filewalker(node, node->sub)==NULL){
-			printf("--DEBUG--\nNO DIRS IN PWD\n");
+			printf("[--DEBUG-NO-SUBDIR--\n");
+			
+			freewilli=root;
+			
+			while(freewilli!=NULL){
+				puts(freewilli->path);
+				freewilli=freewilli->sub;
+			}
 
 			next_dir:
 				
 				freewilli=node;
 				node=node->next;
+				
+				printf("TRY NEXT PATH: %s\n",node->path);
+				
+				freewilli->top->sub=node;
+
 				if(node==NULL){
 					node=freewilli->top;
+
+					printf("TRY PARENT PATH: %s\n", node->path);
+
 					free(freewilli);
+					
+					if(node->top==NULL)break;
+					
 					if(chdir("..")<0){
 						perror("chdir");
 						return -1;
 					}
 
 			goto next_dir;
-
-
-			}
+				
+				}
+			
+			
 			free(freewilli);
 
 			if(chdir("..")<0){
@@ -42,14 +61,14 @@ int fd_scandir(const char* path){
 				return -1;
 			}
 
+			printf("--DEBUG-NO-SUBDIR--]\n");
+
 		}else{
-			printf("--DEBUG--\nGOTO SUBDIR %p >> %s\n", node->sub, node->sub->path);
 			node=node->sub;
 		}
 
 		if(chdir(node->path)<0){
 			perror("chdir");
-			puts(get_current_dir_name());
 			puts(node->path);
 			return -1;
 		}
@@ -89,7 +108,7 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia){
 				perror("stat");
 			} else {
 
-				printf("%s/%s:\n", luke->path, pwd_ent->d_name);
+//				printf("%s/%s:\n", luke->path, pwd_ent->d_name);
 
 {
 	//			puts("\t------------------------------------");

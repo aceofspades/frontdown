@@ -22,7 +22,7 @@ enum connection_type {
 struct{
 	char source[16384];
 	
-	char destination[16384];
+	char destination[FD_PATHLEN];
 	char destinationLogin;
 	char *destinationUname;
 	char *destinationPwd;
@@ -35,6 +35,7 @@ struct{
 	
 	char conf[16384];
 	long long last_backup;
+	long long now;
 } config;
 
 

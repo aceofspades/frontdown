@@ -52,6 +52,8 @@ int fd_scandir(const char* path, long long timestamp, struct exclude_list *exclu
 	strcpy(root->path, ".");
 	pathstring[0]='.';
 	dirpointer[dirptrc]=&pathstring[1];
+
+	create_dest_dir(pathstring);
 	
 	node=root;
 

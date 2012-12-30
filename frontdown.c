@@ -43,6 +43,7 @@ int main(int argc, char **argv){
 	// Initialize exclude lists
 	config.excludes = calloc(1, sizeof(struct exclude_list));
 	config.con=-1;
+	config.now=(long long)time(NULL);
 	
 	latest_exclude = config.excludes;
 	
@@ -60,10 +61,11 @@ int main(int argc, char **argv){
 	
 	// Get index.db
 	char indexpath[16384];
+	char fixbuf[64];
 	char *buf;
 	strcpy(indexpath, config.destination);
-	strcat(indexpath, "index.db");
-	
+	strcat(indexpath, "/index.db");
+
 	if(config.destinationLogin){
 		printf("To provide maximal security we won't display any character entered!\n\n");
 
@@ -85,6 +87,11 @@ int main(int argc, char **argv){
 	
 	open_destination(config.destination);
 	create_dest_dir("/");
+
+	sprintf(fixbuf,"%0*lld/", 15,config.now);
+	strcat(config.destination, "/BACKUP");
+	strcat(config.destination, fixbuf);
+
 	fd_scandir(config.source, config.last_backup, config.excludes);
 	close_destination();
 	

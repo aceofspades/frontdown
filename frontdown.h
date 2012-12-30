@@ -15,10 +15,7 @@ struct exclude_list *latest_exclude;
 
 struct{
 	char source[16384];
-	char sourceLogin;
-	char *sourceUname;
-	char *sourcePwd;
-
+	
 	char destination[16384];
 	char destinationLogin;
 	char *destinationUname;

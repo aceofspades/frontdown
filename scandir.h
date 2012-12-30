@@ -9,6 +9,7 @@
 #include <regex.h>
 
 #include "frontdown.h"
+#include "communication.h"
 #include "fd_curl.h"
 
 #ifndef __SCANDIR_H__

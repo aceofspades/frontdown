@@ -25,13 +25,12 @@ void parse_options(int argc, char **argv){
 	config.hidden      = 0;
 	config.threads     = 1;
 	config.last_backup = 0;
-	config.sourceLogin = 0;
 	config.destinationLogin = 0;
 
 	char s=0, d=0, c=0;
 
 	while(1){
-		opt = getopt_long(argc, argv, "s:d:t:Hhc:e:E:lL", command_options, &option_index);
+		opt = getopt_long(argc, argv, "s:d:t:Hhc:e:E:l", command_options, &option_index);
 		if(opt == -1)
 			break;
 		
@@ -46,8 +45,6 @@ void parse_options(int argc, char **argv){
 		} else if(opt == 'H'){
 			config.hidden = 1;
 		} else if(opt == 'l'){
-			config.sourceLogin = 1;
-		} else if(opt == 'L'){
 			config.destinationLogin = 1;
 		} else if(opt == 'h'){
 			help();

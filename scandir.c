@@ -5,6 +5,27 @@ int FilesUpdated=0;
 
 
 void upload(const char *source, char *relpath, char *name, struct stat filestat){
+	char srcpathstring[FD_PATHLEN]={0};
+	char dstpathstring[FD_PATHLEN]={0};
+	int len;
+	
+	strcpy(srcpathstring, source);
+	len=strlen(source);
+	srcpathstring[len]='/';
+	strcpy(&srcpathstring[len+1], relpath);
+	len+=1+strlen(relpath);
+	srcpathstring[len]='/';
+	strcpy(&srcpathstring[len+1], name);
+
+	strcpy(dstpathstring, config.destination);
+	len=strlen(config.destination);
+	dstpathstring[len]='/';
+	strcpy(&dstpathstring[len+1], relpath);
+	len+=1+strlen(relpath);
+	dstpathstring[len]='/';
+	strcpy(&dstpathstring[len+1], name);
+
+	put_file(srcpathstring, name, dstpathstring, filestat.st_size);
 	FilesUpdated += 1;
 }
 

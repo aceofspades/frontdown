@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <curl/curl.h>
-
-#include "frontdown.h"
+#include "communication.h"
 
 // This code was basically adjusted from
 // http://curl.haxx.se/libcurl/c/ftpget.html
@@ -66,27 +61,36 @@ int put_file(char *source, char *filename, char *target, curl_off_t size){
 	CURL *curl;
 	CURLcode result;
 	
-	struct curl_slist *commandlist;
+	struct curl_slist *commandlist=NULL;
 	FILE *handle = fopen(source, "rb");
 	curl_global_init(CURL_GLOBAL_ALL);
 	curl = curl_easy_init();
 	
 	char cmd_buffer[strlen(source)+6];
-	strcpy(cmd_buffer, "RNFR");
+	strcpy(cmd_buffer, "RNFR ");
 	strcat(cmd_buffer, filename);
 	
 	if(curl && handle != NULL){
 		commandlist = curl_slist_append(commandlist, cmd_buffer);
 		curl_easy_setopt(curl, CURLOPT_READFUNCTION, fileread);
 		curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
+		curl_easy_setopt(curl, CURLOPT_FTP_CREATE_MISSING_DIRS , 1);
+		curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
 		curl_easy_setopt(curl, CURLOPT_URL, target);
 		curl_easy_setopt(curl, CURLOPT_POSTQUOTE, commandlist);
 		curl_easy_setopt(curl, CURLOPT_READDATA, handle);
 		curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)size);
 		
+		if(config.destinationLogin){
+			curl_easy_setopt(curl, CURLOPT_USERNAME, config.destinationUname);			
+			curl_easy_setopt(curl, CURLOPT_PASSWORD, config.destinationPwd);			
+		}
+		
 		result = curl_easy_perform(curl);
-		if(result != CURLE_OK)
+		if(result != CURLE_OK){
+			fclose(handle);
 			return 1;
+		}
 		
 		curl_slist_free_all(commandlist);
 		curl_easy_cleanup(curl);

@@ -25,8 +25,7 @@ void usage(void){
 	printf("\t-e --exclude       File/Folder to exclude as POSIX Extended Regular Expressions\n");
 	printf("\t-h --help          Print this help\n");
 	printf("\t-H --hidden        Include files starting with .\n");
-	printf("\t-l                 Source requires login\n");
-	printf("\t-L                 Destination requires login\n");
+	printf("\t-l                 Destination requires login\n");
 	printf("\t-s --source        Backup source\n");
 	
 	printf("\n");
@@ -63,21 +62,24 @@ int main(int argc, char **argv){
 	
 	// Get index.db
 	char indexpath[16384];
+	char *buf;
 	strcpy(indexpath, config.destination);
 	strcat(indexpath, "index.db");
 	
-	if(config.destinationLogin||config.sourceLogin){
+	if(config.destinationLogin){
 		printf("To provide maximal security we won't display any character entered!\n\n");
-		if(config.sourceLogin){
-			config.sourceUname=getpass("Source User: ");
-			config.sourcePwd=getpass("Source Password: ");
-			printf("\n\n");
-		}
-		if(config.destinationLogin){
-			config.sourceUname=getpass("Destination User: ");
-			config.sourcePwd=getpass("Destination Password: ");			
-			printf("\n\n");
-		}
+
+		config.destinationUname=getpass("Destination User: ");
+		buf=malloc(strlen(config.destinationUname));
+		strcpy(buf, config.destinationUname);
+		config.destinationUname=buf;
+
+		config.destinationPwd=getpass("Destination Password: ");			
+		buf=malloc(strlen(config.destinationPwd));
+		strcpy(buf, config.destinationPwd);
+		config.destinationPwd=buf;
+
+		printf("\n\n");
 	}
 	
 	get_indexfile(indexpath);

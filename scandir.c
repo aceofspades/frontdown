@@ -101,13 +101,15 @@ int fd_scandir(const char* path, long long timestamp, struct exclude_list *exclu
 			puts(node->path);
 			return -1;
 		}
-
+		
 		//update pathstring
 		dirptrc++;
 		*dirpointer[dirptrc-1]='/';
 		memcpy(dirpointer[dirptrc-1]+1, node->path, strlen(node->path));
 		dirpointer[dirptrc]=dirpointer[dirptrc-1]+1+strlen(node->path);
 		*dirpointer[dirptrc]='\0';
+		
+		create_dest_dir(pathstring);
 
 	}while(node->top!=NULL);
 	

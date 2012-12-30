@@ -9,6 +9,13 @@ struct ftpfile{
 	FILE *stream;
 };
 
+struct {
+	void *curl;
+	CURLcode result;
+	struct curl_slist *commandlist;
+} dst_connection;
+
+
 int filewrite(void *buf, size_t size, size_t nmemb, void *stream){
 	struct ftpfile *out = (struct ftpfile *)stream;
 	if(out && !out->stream){
@@ -57,11 +64,33 @@ int get_indexfile(char *source){
 	return 0;
 }
 
-struct {
-	void *curl;
-	CURLcode result;
-	struct curl_slist *commandlist;
-} dst_connection;
+int create_dest_dir(char *relpath){
+	char fullpath[FD_PATHLEN]={0};
+
+	if(config.con==-1){
+		char buf[6]={0};
+		int i;
+		for(i=0;i<6;i++){
+			if(config.destination[i]==':') break;
+			buf[i]=config.destination[i];
+		}
+		if(strcasecmp(buf,"file")==0) config.con=_FILE_;
+	}
+	
+	switch(config.con){
+		case _FILE_:
+			strcpy(fullpath, &config.destination[7]);
+			strcat(fullpath, relpath);
+			mkdir(fullpath ,S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+			printf("-\n-\n-\n-\n-\n-\n-\n-\n-\n-\nMKDIR: %s\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n", fullpath);
+		break;
+
+		case _UNKNOWN_:
+		default:
+		break;
+	}
+	return 0;
+}
 
 int close_destination(){
 	curl_easy_cleanup(dst_connection.curl);

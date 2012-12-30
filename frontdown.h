@@ -12,6 +12,12 @@ struct exclude_list{
 };
 struct exclude_list *latest_exclude;
 
+enum connection_type {
+	_DICT_, _FILE_, _FTP_, _HTTP_, _IMAP_, _LDAP_,
+	_POP3_, _RTMP_, _RTSP_, _SCP_, _SFTP_, _SMTP_, _TELNET_,
+	_TFTP_, _UNKNOWN_
+};
+
 
 struct{
 	char source[16384];
@@ -22,6 +28,8 @@ struct{
 	char *destinationPwd;
 	
 	unsigned int threads;
+	
+	enum connection_type con;
 	
 	struct exclude_list *excludes;
 	

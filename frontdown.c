@@ -42,6 +42,7 @@ void help(){
 int main(int argc, char **argv){
 	// Initialize exclude lists
 	config.excludes = calloc(1, sizeof(struct exclude_list));
+	config.con=-1;
 	
 	latest_exclude = config.excludes;
 	
@@ -81,6 +82,7 @@ int main(int argc, char **argv){
 	
 	get_indexfile(indexpath);
 	
+	create_dest_dir("/");
 	open_destination(config.destination);
 	fd_scandir(config.source, config.last_backup, config.excludes);
 	close_destination();

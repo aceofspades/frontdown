@@ -51,7 +51,7 @@ int get_indexfile(char *source){
 		curl_easy_cleanup(curl);
 		
 		if(result != CURLE_OK){
-			fprintf(stderr, "Could not download index file.\n");
+			perror("Could not download index file. ");
 			return 1;
 		}
 	}
@@ -75,13 +75,17 @@ int create_dest_dir(char *relpath){
 			buf[i]=config.destination[i];
 		}
 		if(strcasecmp(buf,"file")==0) config.con=_FILE_;
+		else if(strcasecmp(buf,"ftp")==0) config.con=_FTP_;
+		else config.con=_UNKNOWN_;
 	}
 	
 	switch(config.con){
 		case _FILE_:
 			strcpy(fullpath, &config.destination[7]);
-			strcat(fullpath, relpath);
-			mkdir(fullpath ,S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+			strcat(fullpath, &relpath[1]);
+			if(mkdir(fullpath ,S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)!=0){
+				perror("MKDIR");
+			}
 		break;
 
 		case _UNKNOWN_:
@@ -118,7 +122,7 @@ int open_destination(char *target){
 		if(dst_connection.result != CURLE_OK){
 			if(errno==EISDIR)return 0;
 			perror("CURL DST_CONNECTION");
-			exit(-1);
+			exit(1);
 			return 1;
 		}
 	}

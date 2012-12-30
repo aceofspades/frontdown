@@ -1,6 +1,7 @@
 #include "scandir.h"
 
 int FilesFound=0;
+int FilesFailed=0;
 int FilesUpdated=0;
 
 
@@ -55,6 +56,8 @@ int fd_scandir(const char* path, long long timestamp, struct exclude_list *exclu
 	node=root;
 
 	do{
+		printf("%s\n", pathstring);
+
 		if(anakin_filewalker(node, node->sub, sourcepath, pathstring, timestamp, excludes)==NULL){ //No more subdirs
 
 			next_dir:
@@ -67,11 +70,8 @@ int fd_scandir(const char* path, long long timestamp, struct exclude_list *exclu
 
 				if(node==NULL){	//if no directory left in this stage
 					node=freewilli->top; //move one stage up
-
 					free(freewilli);	//free old stage
-					
 					if(node->top==NULL)break; //validate stage
-					
 					if(chdir("..")<0){		//change directory
 						perror("chdir");
 						return -1;
@@ -82,7 +82,6 @@ int fd_scandir(const char* path, long long timestamp, struct exclude_list *exclu
 			goto next_dir;	//last subdir of current dir was handled, so we need to get the next
 				
 				}
-						
 			free(freewilli); //free old dir
 
 			if(chdir("..")<0){
@@ -113,7 +112,9 @@ int fd_scandir(const char* path, long long timestamp, struct exclude_list *exclu
 
 	}while(node->top!=NULL);
 	
-	printf("Total %d folders/files\nUpdated %d files\n", FilesFound, FilesUpdated);
+	printf("Total %d folders/files\n\
+	Updated %d files\n\
+	Failed on %d files\n", FilesFound, FilesUpdated, FilesFailed);
 
 	chdir(orig_dir);
 	return 0; 
@@ -126,7 +127,7 @@ int filter(char *path, char *name, long long timestamp, long long time, struct e
 	int status;
 	char pathstring[FD_PATHLEN]={0};
 	struct exclude_list *excl_walker;
-	regex_t    re;
+	regex_t re;
 	
 	excl_walker=excludes;
 
@@ -161,6 +162,7 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, co
 
 	if((pwd=opendir("."))==NULL){
 		perror("opendir");
+		FilesFailed++;
 		return leia;
 	}
 	
@@ -177,12 +179,11 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, co
 		#else
 			if(lstat(path, &buf)<0){
 		#endif
+				FilesFailed++;
 				perror("stat");
 			} else {
 
 				if(filter(cpath, pwd_ent->d_name, buf.st_mtime, time, excludes)==0){
-					printf("%s/%s/%s\n", source, cpath, pwd_ent->d_name);
-
 					if(S_ISREG(buf.st_mode)){					
 						upload(source, cpath, pwd_ent->d_name, buf);
 					}

@@ -12,8 +12,6 @@ void parse_options(int argc, char **argv){
 	struct option command_options[] = {
 		{"source", required_argument, 0, 's'},
 		{"destination", required_argument, 0, 'd'},
-		{"threads", required_argument, 0, 't'},
-		{"hidden", no_argument, 0, 'H'},
 		{"help", no_argument, 0, 'h'},
 		{"conf", required_argument, 0, 'c'},
 		{"exclude", required_argument, 0, 'e'},
@@ -22,15 +20,13 @@ void parse_options(int argc, char **argv){
 	int opt, option_index=0;
 	
 	// Defaults
-	config.hidden      = 0;
-	config.threads     = 1;
 	config.last_backup = 0;
 	config.destinationLogin = 0;
 
 	char s=0, d=0, c=0;
 
 	while(1){
-		opt = getopt_long(argc, argv, "s:d:t:Hhc:e:E:l", command_options, &option_index);
+		opt = getopt_long(argc, argv, "s:d:t:hc:e:E:l", command_options, &option_index);
 		if(opt == -1)
 			break;
 		
@@ -40,10 +36,6 @@ void parse_options(int argc, char **argv){
 		} else if(opt == 'd'){
 			strncpy(config.destination, optarg, 16383);
 			d=1;
-		} else if(opt == 't'){
-			config.threads = atoi(optarg);
-		} else if(opt == 'H'){
-			config.hidden = 1;
 		} else if(opt == 'l'){
 			config.destinationLogin = 1;
 		} else if(opt == 'h'){

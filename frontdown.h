@@ -22,7 +22,6 @@ struct{
 	char *destinationPwd;
 	
 	unsigned int threads;
-	char hidden;
 	
 	struct exclude_list *excludes;
 	

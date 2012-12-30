@@ -26,20 +26,6 @@ int parse_config(void){
 	memcpy(config.destination, test_ptr, 16384);
 	
 	
-	test_ptr = search_for_key("threads", 0);
-	if(test_ptr == NULL){
-		search_destroy();
-		return 0;
-	}
-	config.threads = atoi(test_ptr);
-	
-	test_ptr = search_for_key("hidden", 0);
-	if(test_ptr == NULL){
-		search_destroy();
-		return 0;
-	}
-	config.hidden = strcmp(test_ptr, "yes")==0?1:0;
-	
 	// optional
 	test_ptr = search_for_key("lastbackup", 0);
 	if(test_ptr != NULL){

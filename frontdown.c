@@ -24,7 +24,6 @@ void usage(void){
 	printf("\t-d --destination   Backup destination\n");
 	printf("\t-e --exclude       File/Folder to exclude as POSIX Extended Regular Expressions\n");
 	printf("\t-h --help          Print this help\n");
-	printf("\t-H --hidden        Include files starting with .\n");
 	printf("\t-l                 Destination requires login\n");
 	printf("\t-s --source        Backup source\n");
 	
@@ -54,8 +53,6 @@ int main(int argc, char **argv){
 	printf("Configuration File:     %s\n", strlen(config.conf)==0?"None":config.conf);
 	printf("Source:                 %s\n", config.source);
 	printf("Destination:            %s\n", config.destination);
-	printf("Threads:                %d\n", config.threads);
-	printf("Include hidden Files:   %s\n", config.hidden==0?"no":"yes");
 	printf("Last backup:            %s\n", config.last_backup==0?"Never before":ctime((time_t*)&config.last_backup));
 	printf("========================================================================\n\n");
 	

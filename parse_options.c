@@ -32,9 +32,19 @@ void parse_options(int argc, char **argv){
 			break;
 		
 		if(opt == 's'){
+			if(s){
+				fprintf(stderr, "Cannot use more than 1 source directory at the moment\n");
+				exit(1);
+			}
+			
 			strncpy(config.source, optarg, 16383);
 			s=1;
 		} else if(opt == 'd'){
+			if(d){
+				fprintf(stderr, "Cannot use more than 1 destination directory at the moment\n");
+				exit(1);
+			}
+			
 			strncpy(config.destination, optarg, 16383);
 			d=1;
 		} else if(opt == 'l'){
@@ -43,10 +53,15 @@ void parse_options(int argc, char **argv){
 			help();
 			exit(0);
 		} else if(opt == 'c'){
+			if(c){
+				fprintf(stderr, "Only 1 configuration file is allowed\n");
+				exit(1);
+			}
+			
 			strncpy(config.conf, optarg, 16383);
 			if(!parse_config()){
 				fprintf(stderr, "Error parsing configuration file\n");
-				abort();
+				exit(1);
 			}
 			c=1;
 			
@@ -55,14 +70,13 @@ void parse_options(int argc, char **argv){
 			latest_exclude->next = calloc(1, sizeof(struct exclude_list));
 			latest_exclude = latest_exclude->next;
 		} else{
-			abort();
+			exit(1);
 		}
 	}
 	
 	if(!(c || (s && d))){
-		errno = EINVAL;
-		perror("Need configuration file or source and destination");
-		abort();
+		fprintf(stderr, "Need configuration file or source and destination");
+		exit(1);
 	}
 	
 	if(optind < argc){

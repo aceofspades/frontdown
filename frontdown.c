@@ -24,7 +24,7 @@ void usage(void){
 	printf("\t-d --destination   Backup destination\n");
 	printf("\t-e --exclude       File/Folder to exclude as POSIX Extended Regular Expressions\n");
 	printf("\t-h --help          Print this help\n");
-	printf("\t-l                 Destination requires login\n");
+	printf("\t-l --login         Destination requires login\n");
 	printf("\t-s --source        Backup source\n");
 	
 	printf("\n");
@@ -80,7 +80,8 @@ int main(int argc, char **argv){
 		printf("\n\n");
 	}
 	
-	get_indexfile(indexpath);
+	if(config.last_backup != 0)
+		get_indexfile(indexpath);
 	
 	create_dest_dir("/");
 	open_destination(config.destination);

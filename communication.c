@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <curl/curl.h>
 
 #include "frontdown.h"
@@ -24,6 +26,10 @@ int filewrite(void *buf, size_t size, size_t nmemb, void *stream){
 	return fwrite(buf, size, nmemb, out->stream);
 }
 
+int fileread(void *ptr, int size, int n, void *stream){
+	return (curl_off_t)fread(ptr, size, n, stream);
+}
+
 
 int get_indexfile(char *source){
 	CURL *curl;
@@ -42,8 +48,9 @@ int get_indexfile(char *source){
 		result = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
 		
-		if(CURLE_OK != result){
+		if(result != CURLE_OK){
 			fprintf(stderr, "Could not download index file.\n");
+			return 1;
 		}
 	}
 	
@@ -53,4 +60,41 @@ int get_indexfile(char *source){
 	curl_global_cleanup();
 	
 	return 0;
+}
+
+int put_file(char *source, char *filename, char *target, curl_off_t size){
+	CURL *curl;
+	CURLcode result;
+	
+	struct curl_slist *commandlist;
+	FILE *handle = fopen(source, "rb");
+	curl_global_init(CURL_GLOBAL_ALL);
+	curl = curl_easy_init();
+	
+	char cmd_buffer[strlen(source)+6];
+	strcpy(cmd_buffer, "RNFR");
+	strcat(cmd_buffer, filename);
+	
+	if(curl && handle != NULL){
+		commandlist = curl_slist_append(commandlist, cmd_buffer);
+		curl_easy_setopt(curl, CURLOPT_READFUNCTION, fileread);
+		curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
+		curl_easy_setopt(curl, CURLOPT_URL, target);
+		curl_easy_setopt(curl, CURLOPT_POSTQUOTE, commandlist);
+		curl_easy_setopt(curl, CURLOPT_READDATA, handle);
+		curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)size);
+		
+		result = curl_easy_perform(curl);
+		if(result != CURLE_OK)
+			return 1;
+		
+		curl_slist_free_all(commandlist);
+		curl_easy_cleanup(curl);
+	}
+	
+	fclose(handle);
+	curl_global_cleanup();
+	
+	return 0;
+
 }

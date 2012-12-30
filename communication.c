@@ -82,7 +82,6 @@ int create_dest_dir(char *relpath){
 			strcpy(fullpath, &config.destination[7]);
 			strcat(fullpath, relpath);
 			mkdir(fullpath ,S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-			printf("-\n-\n-\n-\n-\n-\n-\n-\n-\n-\nMKDIR: %s\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n", fullpath);
 		break;
 
 		case _UNKNOWN_:
@@ -107,7 +106,7 @@ int open_destination(char *target){
 		dst_connection.commandlist = curl_slist_append(dst_connection.commandlist, "NOOP");
 		curl_easy_setopt(dst_connection.curl, CURLOPT_READFUNCTION, fileread);
 		curl_easy_setopt(dst_connection.curl, CURLOPT_FTP_CREATE_MISSING_DIRS , 1);
-		curl_easy_setopt(dst_connection.curl, CURLOPT_VERBOSE, 1);
+		//~ curl_easy_setopt(dst_connection.curl, CURLOPT_VERBOSE, 1);
 		curl_easy_setopt(dst_connection.curl, CURLOPT_URL, target);
 	
 		if(config.destinationLogin){

@@ -81,7 +81,9 @@ int main(int argc, char **argv){
 	
 	get_indexfile(indexpath);
 	
+	open_destination(config.destination);
 	fd_scandir(config.source, config.last_backup, config.excludes);
+	close_destination();
 	
 	return 0;
 }

@@ -57,48 +57,75 @@ int get_indexfile(char *source){
 	return 0;
 }
 
-int put_file(char *source, char *filename, char *target, curl_off_t size){
-	CURL *curl;
+struct {
+	void *curl;
 	CURLcode result;
-	
-	struct curl_slist *commandlist=NULL;
-	FILE *handle = fopen(source, "rb");
+	struct curl_slist *commandlist;
+} dst_connection;
+
+int close_destination(){
+	curl_easy_cleanup(dst_connection.curl);
+	curl_global_cleanup();
+	return 0;
+}
+
+int open_destination(char *target){
+	CURL *curl;
 	curl_global_init(CURL_GLOBAL_ALL);
-	curl = curl_easy_init();
+	dst_connection.curl = curl=curl_easy_init();
+
+	if(dst_connection.curl){
+		dst_connection.commandlist = curl_slist_append(dst_connection.commandlist, "NOOP");
+		curl_easy_setopt(dst_connection.curl, CURLOPT_READFUNCTION, fileread);
+		curl_easy_setopt(dst_connection.curl, CURLOPT_FTP_CREATE_MISSING_DIRS , 1);
+		curl_easy_setopt(dst_connection.curl, CURLOPT_VERBOSE, 1);
+		curl_easy_setopt(dst_connection.curl, CURLOPT_URL, target);
+	
+		if(config.destinationLogin){
+			curl_easy_setopt(dst_connection.curl, CURLOPT_USERNAME, config.destinationUname);			
+			curl_easy_setopt(dst_connection.curl, CURLOPT_PASSWORD, config.destinationPwd);			
+		}
+		
+		dst_connection.result = curl_easy_perform(dst_connection.curl);
+		if(dst_connection.result != CURLE_OK){
+			if(errno==EISDIR)return 0;
+			perror("CURL DST_CONNECTION");
+			exit(-1);
+			return 1;
+		}
+	}
+	curl_slist_free_all(dst_connection.commandlist);
+	dst_connection.commandlist=NULL;
+	return 0;
+}
+
+int put_file(char *source, char *filename, char *target, curl_off_t size){
+	FILE *handle = fopen(source, "rb");
 	
 	char cmd_buffer[strlen(source)+6];
 	strcpy(cmd_buffer, "RNFR ");
 	strcat(cmd_buffer, filename);
 	
-	if(curl && handle != NULL){
-		commandlist = curl_slist_append(commandlist, cmd_buffer);
-		curl_easy_setopt(curl, CURLOPT_READFUNCTION, fileread);
-		curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
-		curl_easy_setopt(curl, CURLOPT_FTP_CREATE_MISSING_DIRS , 1);
-		curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
-		curl_easy_setopt(curl, CURLOPT_URL, target);
-		curl_easy_setopt(curl, CURLOPT_POSTQUOTE, commandlist);
-		curl_easy_setopt(curl, CURLOPT_READDATA, handle);
-		curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)size);
-		
-		if(config.destinationLogin){
-			curl_easy_setopt(curl, CURLOPT_USERNAME, config.destinationUname);			
-			curl_easy_setopt(curl, CURLOPT_PASSWORD, config.destinationPwd);			
-		}
-		
-		result = curl_easy_perform(curl);
-		if(result != CURLE_OK){
+	if(dst_connection.curl && handle != NULL){
+		dst_connection.commandlist = curl_slist_append(dst_connection.commandlist, cmd_buffer);
+		curl_easy_setopt(dst_connection.curl, CURLOPT_URL, target);
+		curl_easy_setopt(dst_connection.curl, CURLOPT_UPLOAD, 1);
+		curl_easy_setopt(dst_connection.curl, CURLOPT_POSTQUOTE, dst_connection.commandlist);
+		curl_easy_setopt(dst_connection.curl, CURLOPT_READDATA, handle);
+		curl_easy_setopt(dst_connection.curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)size);
+				
+		dst_connection.result = curl_easy_perform(dst_connection.curl);
+		if(dst_connection.result != CURLE_OK){
+			perror("PUT_FILE");
+			curl_slist_free_all(dst_connection.commandlist);
+			dst_connection.commandlist=NULL;
 			fclose(handle);
 			return 1;
 		}
-		
-		curl_slist_free_all(commandlist);
-		curl_easy_cleanup(curl);
 	}
 	
 	fclose(handle);
-	curl_global_cleanup();
-	
+	curl_slist_free_all(dst_connection.commandlist);
+	dst_connection.commandlist=NULL;
 	return 0;
-
 }

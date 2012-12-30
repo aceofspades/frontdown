@@ -80,7 +80,8 @@ int main(int argc, char **argv){
 		printf("\n\n");
 	}
 	
-	get_indexfile(indexpath);
+	if(config.last_backup != 0)
+		get_indexfile(indexpath);
 	
 	create_dest_dir("/");
 	open_destination(config.destination);

@@ -20,11 +20,14 @@ void version(void){
 
 void usage(void){
 	printf("Usage: frontdown [OPTIONS] \n\n");
-	printf("\t-h --help          Print this help\n");
-	printf("\t-s --source        Backup Source\n");
-	printf("\t-d --destination   Backup Destination\n");
-	printf("\t-H --hidden        Include files starting with .\n");
 	printf("\t-c --conf          Configuration file\n");
+	printf("\t-d --destination   Backup destination\n");
+	printf("\t-e --exclude       File/Folder to exclude as POSIX Extended Regular Expressions\n");
+	printf("\t-h --help          Print this help\n");
+	printf("\t-H --hidden        Include files starting with .\n");
+	printf("\t-l                 Source requires login\n");
+	printf("\t-L                 Destination requires login\n");
+	printf("\t-s --source        Backup source\n");
 	
 	printf("\n");
 	printf("There are no bugs - just random features.\n");
@@ -40,11 +43,9 @@ void help(){
 
 int main(int argc, char **argv){
 	// Initialize exclude lists
-	config.file_excludes = calloc(1, sizeof(struct exclude_list));
-	config.dir_excludes = calloc(1, sizeof(struct exclude_list));
+	config.excludes = calloc(1, sizeof(struct exclude_list));
 	
-	latest_file_exclude = config.file_excludes;
-	latest_dir_exclude = config.dir_excludes;
+	latest_exclude = config.excludes;
 	
 	// Parse command line options
 	parse_options(argc, argv);
@@ -65,9 +66,23 @@ int main(int argc, char **argv){
 	strcpy(indexpath, config.destination);
 	strcat(indexpath, "index.db");
 	
+	if(config.destinationLogin||config.sourceLogin){
+		printf("To provide maximal security we won't display any character entered!\n\n");
+		if(config.sourceLogin){
+			config.sourceUname=getpass("Source User: ");
+			config.sourcePwd=getpass("Source Password: ");
+			printf("\n\n");
+		}
+		if(config.destinationLogin){
+			config.sourceUname=getpass("Destination User: ");
+			config.sourcePwd=getpass("Destination Password: ");			
+			printf("\n\n");
+		}
+	}
+	
 	get_indexfile(indexpath);
 	
-	fd_scandir(config.source, config.last_backup, config.file_excludes, config.dir_excludes);
+	fd_scandir(config.source, config.last_backup, config.excludes);
 	
 	return 0;
 }

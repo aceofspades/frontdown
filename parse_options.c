@@ -27,7 +27,7 @@ void parse_options(int argc, char **argv){
 	char s=0, d=0, c=0;
 
 	while(1){
-		opt = getopt_long(argc, argv, "s:d:t:hc:e:E:l", command_options, &option_index);
+		opt = getopt_long(argc, argv, "s:d:t:hc:e:lb", command_options, &option_index);
 		if(opt == -1)
 			break;
 		
@@ -59,6 +59,9 @@ void parse_options(int argc, char **argv){
 			}
 			
 			strncpy(config.conf, optarg, 16383);
+			
+			
+			
 			if(!parse_config()){
 				fprintf(stderr, "Error parsing configuration file\n");
 				exit(1);
@@ -69,6 +72,8 @@ void parse_options(int argc, char **argv){
 			strncpy(latest_exclude->exclude_path, optarg, 16383);
 			latest_exclude->next = calloc(1, sizeof(struct exclude_list));
 			latest_exclude = latest_exclude->next;
+		} else if(opt == 'b'){
+			config.last_backup=1;
 		} else{
 			exit(1);
 		}

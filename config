@@ -1,5 +1,3 @@
-source		/home/
-destination	/tmp/
-hidden		yes
-threads		4
-lastbackup	1356608165
+source = .
+destination = file:///cygdrive/d/MyTestBackup
+lastbackup = 1

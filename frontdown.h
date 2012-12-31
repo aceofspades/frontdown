@@ -36,6 +36,9 @@ struct{
 	char conf[16384];
 	long long last_backup;
 	long long now;
+	
+	FILE *index_db;
+	
 } config;
 
 

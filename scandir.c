@@ -5,7 +5,7 @@ int FilesFailed=0;
 int FilesUpdated=0;
 
 
-void upload(const char *source, char *relpath, char *name, struct stat filestat){
+int upload(const char *source, char *relpath, char *name, struct stat filestat){
 	char srcpathstring[FD_PATHLEN]={0};
 	char dstpathstring[FD_PATHLEN]={0};
 	int len;
@@ -26,8 +26,13 @@ void upload(const char *source, char *relpath, char *name, struct stat filestat)
 	dstpathstring[len]='/';
 	strcpy(&dstpathstring[len+1], name);
 
-	put_file(srcpathstring, name, dstpathstring, filestat.st_size);
-	FilesUpdated += 1;
+	if(put_file(srcpathstring, name, dstpathstring, filestat.st_size)==0){
+		FilesUpdated++;
+		return 0;
+	} else {
+		FilesFailed++;
+		return -1;
+	}
 }
 
 
@@ -39,7 +44,6 @@ int fd_scandir(const char* path, long long timestamp, struct exclude_list *exclu
 	struct dirnode *node, *root, *freewilli;
 	
 	char *orig_dir=get_current_dir_name();
-	printf("%s", orig_dir);
 
 	if(chdir(path)<0){
 		perror("chdir");
@@ -114,9 +118,9 @@ int fd_scandir(const char* path, long long timestamp, struct exclude_list *exclu
 
 	}while(node->top!=NULL);
 	
-	printf("Total %d folders/files\n\
-	Updated %d files\n\
-	Failed on %d files\n", FilesFound, FilesUpdated, FilesFailed);
+	printf("Total %d files\n \
+	\rUpdated %d files\n \
+	\rFailed on %d files\n", FilesFound, FilesUpdated, FilesFailed);
 
 	chdir(orig_dir);
 	return 0; 
@@ -138,7 +142,10 @@ int filter(char *path, char *name, long long timestamp, long long time, struct e
 	pathstring[status]='/';
 	strcpy(&pathstring[status+1], name);
 
-	while(excl_walker!=NULL&&excl_walker->exclude_path[0]!=0){
+	while(excl_walker!=NULL){
+		if(excl_walker->exclude_path[0]==0){
+			strcpy(excl_walker->exclude_path, "^index.db$");
+		}
 		if (regcomp(&re, excl_walker->exclude_path, REG_EXTENDED|REG_NOSUB) != 0) {
 			excl_walker=excl_walker->next;
 			continue;
@@ -185,9 +192,14 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, co
 				perror("stat");
 			} else {
 
+				if(S_ISREG(buf.st_mode)){					
+					FilesFound += 1;
+				}
+
 				if(filter(cpath, pwd_ent->d_name, buf.st_mtime, time, excludes)==0){
-					if(S_ISREG(buf.st_mode)){					
-						upload(source, cpath, pwd_ent->d_name, buf);
+					if(S_ISREG(buf.st_mode)){
+						if(upload(source, cpath, pwd_ent->d_name, buf)==0)
+							fprintf(config.index_db, "%s/%s\n", cpath, pwd_ent->d_name);
 					}
 
 					if(S_ISDIR(buf.st_mode)){					
@@ -201,7 +213,6 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, co
 						strcpy(leia->path, path);
 					}
 				}
-				FilesFound += 1;
 			}
 		}
 	}

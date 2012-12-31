@@ -1,9 +1,5 @@
 #include "communication.h"
 
-// This code was basically adjusted from
-// http://curl.haxx.se/libcurl/c/ftpget.html
-
-
 struct ftpfile{
 	char *filename;
 	FILE *stream;
@@ -16,10 +12,10 @@ struct {
 } dst_connection;
 
 
-int filewrite(void *buf, size_t size, size_t nmemb, void *stream){
+int fileappend(void *buf, size_t size, size_t nmemb, void *stream){
 	struct ftpfile *out = (struct ftpfile *)stream;
 	if(out && !out->stream){
-		out->stream=fopen(out->filename, "wb");
+		out->stream=fopen(out->filename, "ab+");
 		
 		if(!out->stream)
 			return -1;
@@ -43,7 +39,7 @@ int get_indexfile(char *source){
 	
 	if(curl){
 		curl_easy_setopt(curl, CURLOPT_URL, source);
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, filewrite);
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, fileappend);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &downloadfile);
 		//~ curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 		

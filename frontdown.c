@@ -55,7 +55,7 @@ int main(int argc, char **argv){
 	printf("Configuration File:     %s\n", strlen(config.conf)==0?"None":config.conf);
 	printf("Source:                 %s\n", config.source);
 	printf("Destination:            %s\n", config.destination);
-	printf("Last backup:            %s\n", config.last_backup==0?"Never before":ctime((time_t*)&config.last_backup));
+	printf("Backuped before:        %s\n", config.last_backup!=0?"yes":"no");
 	printf("========================================================================\n\n");
 	
 	
@@ -63,6 +63,8 @@ int main(int argc, char **argv){
 	char indexpath[16384];
 	char fixbuf[64];
 	char *buf;
+	struct stat statbuf;
+	
 	strcpy(indexpath, config.destination);
 	strcat(indexpath, "/index.db");
 
@@ -82,17 +84,40 @@ int main(int argc, char **argv){
 		printf("\n\n");
 	}
 	
-	if(config.last_backup != 0)
-		get_indexfile(indexpath);
-	
 	open_destination(config.destination);
+
+	remove("./index.db");
+	if(config.last_backup != 0){
+		get_indexfile(indexpath);
+	}
+
+	//Read last backup time
+	config.index_db=fopen("./index.db", "rb");
+	fscanf(config.index_db, "%lld", &config.last_backup);
+	fclose(config.index_db);
+
+	//Rewrite index.db
+	config.index_db=fopen("./index.db", "wb+");
+	rewind(config.index_db);
+	fprintf(config.index_db, "%0*lld\n", 15, config.now);
+	
 	create_dest_dir("/");
 
-	sprintf(fixbuf,"%0*lld/", 15,config.now);
+	sprintf(fixbuf,"%0*lld/", 15, config.now);
 	strcat(config.destination, "/BACKUP");
 	strcat(config.destination, fixbuf);
 
 	fd_scandir(config.source, config.last_backup, config.excludes);
+
+	fclose(config.index_db);
+
+	if(config.last_backup != 0){
+		get_indexfile(indexpath);
+	}
+
+	stat("./index.db", &statbuf);
+	put_file("./index.db", "index.db", indexpath, statbuf.st_size); 
+
 	close_destination();
 	
 	return 0;

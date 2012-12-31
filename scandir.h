@@ -28,7 +28,7 @@ struct dirnode{
 
 extern int fd_scandir(const char* path, long long timestamp, struct exclude_list *excludes);
 extern struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, const char *source, char *cpath, long long time, struct exclude_list *excludes);
-void upload(const char *source, char *relpath, char *name, struct stat filestat);
+extern int upload(const char *source, char *relpath, char *name, struct stat filestat);
 extern int filter(char *path, char *name, long long timestamp, long long time, struct exclude_list *excludes);
 
 #endif

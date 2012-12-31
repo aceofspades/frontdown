@@ -30,23 +30,18 @@ int fileread(void *ptr, int size, int n, void *stream){
 
 
 int get_indexfile(char *source){
-	CURL *curl;
-	CURLcode result;
-	
 	struct ftpfile downloadfile = {"index.db", NULL};
-	curl_global_init(CURL_GLOBAL_DEFAULT);
-	curl = curl_easy_init();
 	
-	if(curl){
-		curl_easy_setopt(curl, CURLOPT_URL, source);
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, fileappend);
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &downloadfile);
-		//~ curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+	if(dst_connection.curl){
+		curl_easy_setopt(dst_connection.curl, CURLOPT_URL, source);
+		curl_easy_setopt(dst_connection.curl, CURLOPT_WRITEFUNCTION, fileappend);
+		curl_easy_setopt(dst_connection.curl, CURLOPT_WRITEDATA, &downloadfile);
+		//~ curl_easy_setopt(dst_connection.curl, CURLOPT_VERBOSE, 1L);
 		
-		result = curl_easy_perform(curl);
-		curl_easy_cleanup(curl);
+		dst_connection.result = curl_easy_perform(dst_connection.curl);
 		
-		if(result != CURLE_OK){
+		if(dst_connection.result != CURLE_OK){
+			printf("ERROR: %i %s\n",dst_connection.result, source);
 			perror("Could not download index file. ");
 			return 1;
 		}
@@ -54,9 +49,7 @@ int get_indexfile(char *source){
 	
 	if(downloadfile.stream)
 		fclose(downloadfile.stream);
-	
-	curl_global_cleanup();
-	
+		
 	return 0;
 }
 
@@ -151,6 +144,10 @@ int put_file(char *source, char *filename, char *target, curl_off_t size){
 			curl_slist_free_all(dst_connection.commandlist);
 			dst_connection.commandlist=NULL;
 			fclose(handle);
+
+			//modify mtime
+			if(handle=fopen(source, "wb"))
+				fclose(handle);
 			return 1;
 		}
 	}

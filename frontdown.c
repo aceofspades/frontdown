@@ -92,9 +92,10 @@ int main(int argc, char **argv){
 	}
 
 	//Read last backup time
-	config.index_db=fopen("./index.db", "rb");
-	fscanf(config.index_db, "%lld", &config.last_backup);
-	fclose(config.index_db);
+	if(config.index_db=fopen("./index.db", "rb")){
+		fscanf(config.index_db, "%lld", &config.last_backup);
+		fclose(config.index_db);
+	}
 
 	//Rewrite index.db
 	config.index_db=fopen("./index.db", "wb+");

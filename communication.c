@@ -110,12 +110,12 @@ int open_destination(char *target){
 		dst_connection.result = curl_easy_perform(dst_connection.curl);
 		if(dst_connection.result != CURLE_OK && \
 			dst_connection.result != CURLE_REMOTE_FILE_NOT_FOUND && \
-			dst_connection.result != CURLE_FILE_COULDNT_READ_FILE ){ //We only connect, so who cares if file not found?
-			printf("ERROR: %i",dst_connection.result);
-			if(errno==EISDIR)return 0;
-			perror("CURL DST_CONNECTION");
-			exit(1);
-			return 1;
+			dst_connection.result != CURLE_FILE_COULDNT_READ_FILE )
+		{
+				//We only connect, so who cares if file not found?
+				fprintf(stderr, "ERROR: %i", dst_connection.result);
+				fprintf(stderr, "CURL DST_CONNECTION");
+				exit(1);
 		}
 	}
 	curl_slist_free_all(dst_connection.commandlist);

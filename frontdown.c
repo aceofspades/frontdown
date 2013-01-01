@@ -30,7 +30,7 @@ void usage(void){
 	printf("\n");
 	printf("There are no bugs - just random features.\n");
 	printf("Mail them to: <nosupport@nowhere.nix>\n\n");
-	printf("(C) Copyright 2012 by Patrick Eigensatz & Florian Wernli\n\n");
+	printf("(C) Copyright 2012-2013 by Patrick Eigensatz & Florian Wernli\n\n");
 }
 
 

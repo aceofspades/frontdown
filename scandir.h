@@ -10,7 +10,6 @@
 
 #include "frontdown.h"
 #include "communication.h"
-#include "fd_curl.h"
 
 #ifndef __SCANDIR_H__
 #define __SCANDIR_H__

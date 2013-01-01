@@ -1,5 +1,16 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #ifndef __FRONTDOWN_H__
 #define __FRONTDOWN_H__
+
+#ifdef _WIN32_
+	#include "mingw32_fixes.h"
+#endif
+
+#ifdef _GUI_
+	#include "gtkui.h"
+#endif
 
 #define FD_VERSION "0.1"
 #define FD_PATHLEN 65536
@@ -44,6 +55,10 @@ struct{
 
 extern void parse_options(int argc, char **argv);
 extern void help(void);
+
+#include "communication.h"
+#include "parser.h"
+#include "scandir.h"
 
 #endif
 	

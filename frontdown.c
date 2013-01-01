@@ -8,7 +8,6 @@
 
 #include "frontdown.h"
 #include "scandir.h"
-#include "fd_curl.h"
 #include "communication.h"
 
 void version(void){
@@ -27,6 +26,10 @@ void usage(void){
 	printf("\t-l --login         Destination requires login\n");
 	printf("\t-s --source        Backup source\n");
 	
+	#ifdef _GUI_
+	printf("\t-u                 Use GTK UI\n");
+	#endif
+
 	printf("\n");
 	printf("There are no bugs - just random features.\n");
 	printf("Mail them to: <nosupport@nowhere.nix>\n\n");
@@ -44,10 +47,11 @@ int main(int argc, char **argv){
 	config.excludes = calloc(1, sizeof(struct exclude_list));
 	config.con=-1;
 	config.now=(long long)time(NULL);
-	
 	latest_exclude = config.excludes;
 	
 	// Parse command line options
+	config.source[0]=0;
+	config.destination[0]=0;
 	parse_options(argc, argv);
 	
 	// Display parsed options

@@ -146,7 +146,7 @@ int put_file(char *source, char *filename, char *target, curl_off_t size){
 			fclose(handle);
 
 			//modify mtime
-			if(handle=fopen(source, "wb"))
+			if((handle=fopen(source, "ab")))
 				fclose(handle);
 			return 1;
 		}

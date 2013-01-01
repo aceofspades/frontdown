@@ -49,10 +49,25 @@ int main(int argc, char **argv){
 	config.now=(long long)time(NULL);
 	latest_exclude = config.excludes;
 	
-	// Parse command line options
 	config.source[0]=0;
 	config.destination[0]=0;
+
+	// Parse command line options (+ file config if specified)
 	parse_options(argc, argv);
+	
+	
+	char urlbuffer[16384];
+	
+	// Check for URL without scheme (only for destination, at the moment)
+	if(strstr(config.destination, "file://") != config.destination
+	   && strstr(config.destination, "ftp://") != config.destination
+	   && strstr(config.destination, "sftp://") != config.destination
+	   && strstr(config.destination, "ftps://") != config.destination){
+			strcpy(urlbuffer, "file://");
+			strncat(urlbuffer, config.destination, 16384-8);
+			strcpy(config.destination, urlbuffer);
+		}
+	  
 	
 	// Display parsed options
 	printf("================================ CONFIG ================================\n");

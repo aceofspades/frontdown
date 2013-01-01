@@ -17,7 +17,6 @@ int parse_config(void){
 	}
 	memcpy(config.source, test_ptr, strlen(test_ptr)+1); // \0 delimiter
 	
-	
 	test_ptr = search_for_key("destination", 0);
 	if(test_ptr == NULL){
 		search_destroy();

@@ -44,7 +44,7 @@ GtkWidget *FrontDownFrame(){
 
 	GtkWidget *EntrySourcePath;
 	EntrySourcePath=gtk_entry_new();
-	gtk_entry_set_max_length(GTK_ENTRY (EntrySourcePath), 16384);
+	gtk_entry_set_max_length(GTK_ENTRY (EntrySourcePath), 16383);
 	gtk_entry_set_text(GTK_ENTRY (EntrySourcePath), "./");
 	
 	GtkWidget *ButtonSourcePath;
@@ -72,7 +72,7 @@ GtkWidget *FrontDownFrame(){
 
 	GtkWidget *EntryDestinationPath;
 	EntryDestinationPath=gtk_entry_new();
-	gtk_entry_set_max_length(GTK_ENTRY (EntryDestinationPath), 16384);
+	gtk_entry_set_max_length(GTK_ENTRY (EntryDestinationPath), 16383);
 	gtk_entry_set_text(GTK_ENTRY (EntryDestinationPath), "ftp.example.com/MyBackup/");
 
 

@@ -146,7 +146,7 @@ int gui(void){
 
     /* create a new window */
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_widget_set_size_request (GTK_WIDGET (window), 600, 500);
+    gtk_widget_set_size_request (GTK_WIDGET (window), 600, 350);
     gtk_window_set_title (GTK_WINDOW (window), "Frontdown GTK UI");
 	gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 

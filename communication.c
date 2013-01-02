@@ -113,8 +113,8 @@ int open_destination(char *target){
 			dst_connection.result != CURLE_FILE_COULDNT_READ_FILE )
 		{
 				//We only connect, so who cares if file not found?
-				fprintf(stderr, "ERROR: %i", dst_connection.result);
-				fprintf(stderr, "CURL DST_CONNECTION");
+				fprintf(stderr, "ERROR: %i\n", dst_connection.result);
+				perror("CURL DST_CONNECTION");
 				exit(1);
 		}
 	}

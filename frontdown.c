@@ -32,7 +32,7 @@ void usage(void){
 	printf("\t-s --source        Backup source\n");
 	
 	#ifdef _GUI_
-	printf("\t-u                 Use GTK UI\n");
+	printf("\t-u --gui           Use GTK UI\n");
 	#endif
 
 	printf("\n");

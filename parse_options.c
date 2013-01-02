@@ -16,6 +16,7 @@ void parse_options(int argc, char **argv){
 		{"conf", required_argument, 0, 'c'},
 		{"exclude", required_argument, 0, 'e'},
 		{"login", no_argument, 0, 'l'},
+		{"gui", no_argument, 0, 'u'},
 		{0, 0, 0, 0}
 	};
 	int opt, option_index=0;

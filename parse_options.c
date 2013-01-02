@@ -92,8 +92,8 @@ void parse_options(int argc, char **argv){
 			gui();
 			if((config.source[0] && config.destination[0])) return;
 		#endif
-
-		fprintf(stderr, "Need configuration file or source and destination");
+	
+		fprintf(stderr, "Need configuration file or source and destination\n");
 		exit(1);
 	}
 	

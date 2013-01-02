@@ -1,10 +1,17 @@
 TARGET=frontdown
 OBJS=$(patsubst %.c,%.o,$(wildcard *.c))
 CC=gcc
-CFLAGS=-L./ -Wall -g -lpthread -lcurl -D_GNU_SOURCE `pkg-config gtk+-2.0 --cflags --libs`
+CFLAGS=-L./ -Wall -g -lpthread -lcurl -D_GNU_SOURCE
 
-all: $(OBJS)
+gui: CFLAGS += `pkg-config gtk+-2.0 --cflags --libs` -D_GUI_
+
+
+all: clean $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET)
+
+gui: clean $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET)
+
 	
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

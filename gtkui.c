@@ -138,7 +138,7 @@ GtkWidget *FrontDownFrame(){
 	return frame;
 }
 
-int gui(){
+int gui(void){
     GtkWidget *window;
     GtkWidget *main_box;
 

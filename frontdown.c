@@ -10,6 +10,11 @@
 #include "scandir.h"
 #include "communication.h"
 
+#ifdef _GUI_
+	#include "gtkui.h"
+#endif
+
+
 void version(void){
 	printf("\nFrontdown %s\n", FD_VERSION);
 	#ifdef __GNUC__

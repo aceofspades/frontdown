@@ -16,6 +16,7 @@ int parse_options(int argc, char **argv){
 		{"conf", required_argument, 0, 'c'},
 		{"exclude", required_argument, 0, 'e'},
 		{"login", no_argument, 0, 'l'},
+		{"gui", no_argument, 0, 'u'},
 		{0, 0, 0, 0}
 	};
 	int opt, option_index=0;
@@ -91,7 +92,7 @@ int parse_options(int argc, char **argv){
 			if((config.source[0] && config.destination[0])) return;
 		#endif
 
-		fprintf(stderr, "Need configuration file or source and destination");
+		fprintf(stderr, "Need configuration file or source and destination\n");
 		return(-1);
 	}
 	

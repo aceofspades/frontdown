@@ -44,7 +44,7 @@ GtkWidget *FrontDownFrame(){
 
 	GtkWidget *EntrySourcePath;
 	EntrySourcePath=gtk_entry_new();
-	gtk_entry_set_max_length(GTK_ENTRY (EntrySourcePath), 16384);
+	gtk_entry_set_max_length(GTK_ENTRY (EntrySourcePath), 16383);
 	gtk_entry_set_text(GTK_ENTRY (EntrySourcePath), "./");
 	
 	GtkWidget *ButtonSourcePath;
@@ -72,7 +72,7 @@ GtkWidget *FrontDownFrame(){
 
 	GtkWidget *EntryDestinationPath;
 	EntryDestinationPath=gtk_entry_new();
-	gtk_entry_set_max_length(GTK_ENTRY (EntryDestinationPath), 16384);
+	gtk_entry_set_max_length(GTK_ENTRY (EntryDestinationPath), 16383);
 	gtk_entry_set_text(GTK_ENTRY (EntryDestinationPath), "ftp.example.com/MyBackup/");
 
 
@@ -138,7 +138,7 @@ GtkWidget *FrontDownFrame(){
 	return frame;
 }
 
-int gui(){
+int gui(void){
     GtkWidget *window;
     GtkWidget *main_box;
 
@@ -146,7 +146,7 @@ int gui(){
 
     /* create a new window */
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_widget_set_size_request (GTK_WIDGET (window), 600, 500);
+    gtk_widget_set_size_request (GTK_WIDGET (window), 600, 350);
     gtk_window_set_title (GTK_WINDOW (window), "Frontdown GTK UI");
 	gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 

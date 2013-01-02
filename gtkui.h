@@ -10,7 +10,7 @@
 #ifndef __GTKUI_H__
 #define __GTKUI_H__
 
-extern int gui();
+extern int gui(void);
 
 #endif
 

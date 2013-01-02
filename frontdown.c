@@ -44,7 +44,11 @@ void help(){
 
 int main(int argc, char **argv){
 	// Initialize exclude lists
-	config.excludes = calloc(1, sizeof(struct exclude_list));
+	if((config.excludes = calloc(1, sizeof(struct exclude_list)))==NULL){
+		fprintf(stderr,"Make sure you have enough memory and run it again");
+		exit(1);
+	}
+
 	config.con=-1;
 	config.now=(long long)time(NULL);
 	latest_exclude = config.excludes;
@@ -53,8 +57,10 @@ int main(int argc, char **argv){
 	config.destination[0]=0;
 
 	// Parse command line options (+ file config if specified)
-	parse_options(argc, argv);
-	
+	if(parse_options(argc, argv)<0){
+		fprintf(stderr,"\nRun '%s --help' for help", argv[0]);
+		exit(64);
+	}	
 	
 	char urlbuffer[16384];
 	
@@ -106,15 +112,23 @@ int main(int argc, char **argv){
 	open_destination(config.destination);
 
 	remove("./index.db");
-	if(config.last_backup != 0){
-		get_indexfile(indexpath);
+	if(config.last_backup > 0){
+		if(get_indexfile(indexpath)<0){
+			fprintf(stderr, "Do you whish to continue anyway? [y,n]");
+			char cont=0;
+			while(((cont=getc(stdin))!='y')&&(cont!='n'))
+				fprintf(stderr, "Do you whish to continue anyway? [y,n]");
+			
+			if(cont=='n')exit(74);
+		}
+		
+		//Read last backup time
+		if((config.index_db=fopen("./index.db", "rb"))){
+			fscanf(config.index_db, "%lld", &config.last_backup);
+			fclose(config.index_db);
+		}
 	}
 
-	//Read last backup time
-	if((config.index_db=fopen("./index.db", "rb"))){
-		fscanf(config.index_db, "%lld", &config.last_backup);
-		fclose(config.index_db);
-	}
 
 	//Rewrite index.db
 	config.index_db=fopen("./index.db", "wb+");

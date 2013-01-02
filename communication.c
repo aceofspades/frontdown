@@ -43,7 +43,7 @@ int get_indexfile(char *source){
 		if(dst_connection.result != CURLE_OK){
 			printf("ERROR: %i %s\n",dst_connection.result, source);
 			perror("Could not download index file. ");
-			return 1;
+			return -1;
 		}
 	}
 	
@@ -74,6 +74,7 @@ int create_dest_dir(char *relpath){
 			strcat(fullpath, &relpath[1]);
 			if(mkdir(fullpath ,S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)!=0){
 				perror("MKDIR");
+				return -1;
 			}
 		break;
 

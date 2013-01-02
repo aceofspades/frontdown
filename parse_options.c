@@ -8,7 +8,7 @@
 #include "parser.h"
 
 
-void parse_options(int argc, char **argv){
+int parse_options(int argc, char **argv){
 	struct option command_options[] = {
 		{"source", required_argument, 0, 's'},
 		{"destination", required_argument, 0, 'd'},
@@ -34,7 +34,7 @@ void parse_options(int argc, char **argv){
 		if(opt == 's'){
 			if(s){
 				fprintf(stderr, "Cannot use more than 1 source directory at the moment\n");
-				exit(1);
+				return(-1);
 			}
 			
 			strncpy(config.source, optarg, 16383);
@@ -42,7 +42,7 @@ void parse_options(int argc, char **argv){
 		} else if(opt == 'd'){
 			if(d){
 				fprintf(stderr, "Cannot use more than 1 destination directory at the moment\n");
-				exit(1);
+				return(-1);
 			}
 			
 			strncpy(config.destination, optarg, 16383);
@@ -51,20 +51,18 @@ void parse_options(int argc, char **argv){
 			config.destinationLogin = 1;
 		} else if(opt == 'h'){
 			help();
-			exit(0);
+			return(-1);
 		} else if(opt == 'c'){
 			if(c){
 				fprintf(stderr, "Only 1 configuration file is allowed\n");
-				exit(1);
+				return(-1);
 			}
 			
 			strncpy(config.conf, optarg, 16383);
-			
-			
-			
+
 			if(!parse_config()){
 				fprintf(stderr, "Error parsing configuration file\n");
-				exit(1);
+				return(-1);
 			}
 			c=1;
 			
@@ -78,11 +76,11 @@ void parse_options(int argc, char **argv){
 		#ifdef _GUI_
 		else if(opt == 'u'){
 			gui();
-			return;
+			break;
 		}
 		#endif
 		else{
-			exit(1);
+			return(-1);
 		}
 	}
 	
@@ -94,10 +92,12 @@ void parse_options(int argc, char **argv){
 		#endif
 
 		fprintf(stderr, "Need configuration file or source and destination");
-		exit(1);
+		return(-1);
 	}
 	
 	if(optind < argc){
-		printf("Unkown argument: %s\n", argv[optind]);
+		fprintf(stderr, "Unkown argument: %s\n", argv[optind]);
+		return(-1);
 	}
+	return(0);
 }

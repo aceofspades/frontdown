@@ -53,7 +53,7 @@ struct{
 } config;
 
 
-extern void parse_options(int argc, char **argv);
+extern int parse_options(int argc, char **argv);
 extern void help(void);
 
 #include "communication.h"

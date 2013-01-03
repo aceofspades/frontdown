@@ -6,7 +6,9 @@ int frontdown(struct frontdown_config *config){
 	char fixbuf[64];
 	char *buf;
 	struct stat statbuf;
-	
+	FILE *index_db;
+	long long last_backup_time;
+
 	config->info("Backup started");
 
 	dest=(char*)malloc(FD_PATHLEN+30);

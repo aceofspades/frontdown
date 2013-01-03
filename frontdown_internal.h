@@ -5,8 +5,5 @@
 #include "scandir.h"
 #include "communication.h"
 
-FILE *index_db;
-long long last_backup_time;
-
 #endif
 	

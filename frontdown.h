@@ -1,64 +1,79 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #ifndef __FRONTDOWN_H__
 #define __FRONTDOWN_H__
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <dirent.h>
+#include <time.h>
+#include <sys/stat.h>
 
 #ifdef _WIN32_
 	#include "mingw32_fixes.h"
 #endif
 
-#ifdef _GUI_
-	#include "gtkui.h"
-#endif
-
 #define FD_VERSION "0.1"
-#define FD_PATHLEN 65536
+#define FD_PATHLEN 16384
 #define FD_NAMELEN 512
-#define FD_BUCKETSIZE 256
 
-struct exclude_list{
-	char exclude_path[16384];
-	struct exclude_list *next;
+struct frontdown_exclude_list{
+	char exclude_path[FD_PATHLEN];
+	struct frontdown_exclude_list *next;
 };
-struct exclude_list *latest_exclude;
 
-enum connection_type {
+enum frontdown_connection_type {
 	_DICT_, _FILE_, _FTP_, _HTTP_, _IMAP_, _LDAP_,
 	_POP3_, _RTMP_, _RTSP_, _SCP_, _SFTP_, _SMTP_, _TELNET_,
 	_TFTP_, _UNKNOWN_
 };
 
+enum frontdown_error_code{
+	_INDEX_DB_ERROR_, _MKDIR_ERROR_, _DST_CONNECTION_ERROR_, _PUT_FILE_ERROR_
+};
 
-struct{
-	char source[16384];
-	
-	char destination[FD_PATHLEN];
-	char destinationLogin;
+struct frontdown_config{
+	// The maximal source length is FD_PATHLEN
+	char *source;
+
+	// The maximal destination length is FD_PATHLEN
+	char *destination;
+
+	// The maximal destinationUname length is FD_NAMELEN
 	char *destinationUname;
+
+	// The maximal destinationPwd length is FD_NAMELEN
 	char *destinationPwd;
 	
-	unsigned int threads;
+	enum frontdown_connection_type con_type;
 	
-	enum connection_type con;
+	// The last element musst allways have a
+	// NULL pointer as next element;
+	struct frontdown_exclude_list *excludes;
 	
-	struct exclude_list *excludes;
+	// Function to printout informations
+	// e.g. cwd or exclude hints
+	int (*info)(char *);
 	
-	char conf[16384];
-	long long last_backup;
+	// Function for error handling
+	// arg 1 contains error code as above
+	// if arg 2 is !=0 it's a fatal error
+	// arg 3 contains the path to the failing file or directory
+	// it's always the path to the source
+	// to ignore nonfatal error's return 0
+	// return !=0 to abort
+	// a fatal error will always abort
+	int (*error)(enum frontdown_error_code, char, char*);
+	
+	// If last_backup is >0 the timestamp will be loaded from 
+	// destinations index.db
+	char last_backup;
+	
+	//Unix time
 	long long now;
-	
-	FILE *index_db;
-	
-} config;
+};
 
-
-extern int parse_options(int argc, char **argv);
-extern void help(void);
-
-#include "communication.h"
-#include "parser.h"
-#include "scandir.h"
+extern int frontdown(struct frontdown_config *config);
 
 #endif
 	

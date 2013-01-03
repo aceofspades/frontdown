@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "frontdown.h"
+#include "frontdown-cli.h"
 #include "parser.h"
 
 int parse_config(void){	
 	// Init the search
-	search_init(config.conf);
+	search_init(conf);
 	
 	char *test_ptr;
 	test_ptr = search_for_key("source", 0);

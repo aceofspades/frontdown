@@ -4,7 +4,7 @@
 #include <getopt.h>
 #include <errno.h>
 
-#include "frontdown.h"
+#include "frontdown-cli.h"
 #include "parser.h"
 
 
@@ -23,7 +23,7 @@ int parse_options(int argc, char **argv){
 	
 	// Defaults
 	config.last_backup = 0;
-	config.destinationLogin = 0;
+	destinationLogin = 0;
 
 	char s=0, d=0, c=0;
 
@@ -49,17 +49,17 @@ int parse_options(int argc, char **argv){
 			strncpy(config.destination, optarg, 16383);
 			d=1;
 		} else if(opt == 'l'){
-			config.destinationLogin = 1;
+			destinationLogin = 1;
 		} else if(opt == 'h'){
 			help();
-			return(-1);
+			exit(0);
 		} else if(opt == 'c'){
 			if(c){
 				fprintf(stderr, "Only 1 configuration file is allowed\n");
 				return(-1);
 			}
 			
-			strncpy(config.conf, optarg, 16383);
+			strncpy(conf, optarg, 16383);
 
 			if(!parse_config()){
 				fprintf(stderr, "Error parsing configuration file\n");
@@ -69,29 +69,16 @@ int parse_options(int argc, char **argv){
 			
 		} else if(opt == 'e'){
 			strncpy(latest_exclude->exclude_path, optarg, 16383);
-			latest_exclude->next = calloc(1, sizeof(struct exclude_list));
+			latest_exclude->next = calloc(1, sizeof(struct frontdown_exclude_list));
 			latest_exclude = latest_exclude->next;
 		} else if(opt == 'b'){
 			config.last_backup=1;
-		}
-		#ifdef _GUI_
-		else if(opt == 'u'){
-			gui();
-			break;
-		}
-		#endif
-		else{
+		} else{
 			return(-1);
 		}
 	}
 	
 	if(!(c || (s && d))){
-
-		#ifdef _GUI_
-			gui();
-			if((config.source[0] && config.destination[0])) return;
-		#endif
-
 		fprintf(stderr, "Need configuration file or source and destination\n");
 		return(-1);
 	}

@@ -5,9 +5,10 @@ int FilesFailed=0;
 int FilesUpdated=0;
 
 
-int upload(const char *source, char *relpath, char *name, struct stat filestat){
-	char srcpathstring[FD_PATHLEN]={0};
-	char dstpathstring[FD_PATHLEN]={0};
+int upload(struct frontdown_config *config, const char *source, char *relpath, char *name, struct stat filestat){
+	char srcpathstring[FD_PATHLEN*2]={0};
+	char dstpathstring[FD_PATHLEN*2]={0};
+	char ret;
 	int len;
 	
 	strcpy(srcpathstring, source);
@@ -18,53 +19,60 @@ int upload(const char *source, char *relpath, char *name, struct stat filestat){
 	srcpathstring[len]='/';
 	strcpy(&srcpathstring[len+1], name);
 
-	strcpy(dstpathstring, config.destination);
-	len=strlen(config.destination);
+	strcpy(dstpathstring, config->destination);
+	len=strlen(config->destination);
 	dstpathstring[len]='/';
 	strcpy(&dstpathstring[len+1], relpath);
 	len+=1+strlen(relpath);
 	dstpathstring[len]='/';
 	strcpy(&dstpathstring[len+1], name);
+	
+	config->info(dstpathstring);
 
-	if(put_file(srcpathstring, name, dstpathstring, filestat.st_size)==0){
+
+	if((ret=put_file(config, srcpathstring, name, dstpathstring, filestat.st_size))==0){
 		FilesUpdated++;
 		return 0;
-	} else {
+	} else if(ret==-1){
 		FilesFailed++;
 		return -1;
+	} else {
+		return -2;
 	}
 }
 
 
-int fd_scandir(const char* path, long long timestamp, struct exclude_list *excludes){
-	char pathstring[FD_PATHLEN]={0};
-	char *sourcepath;
+int fd_scandir(struct frontdown_config *config, long long timestamp){
+	char pathstring[FD_PATHLEN*2]={0};
 	char *dirpointer[128];
 	int dirptrc=0;
+	char ret;
 	struct dirnode *node, *root, *freewilli;
 	
-	char *orig_dir=get_current_dir_name();
+	char sourcepath[FD_PATHLEN*2];
+	strcpy(sourcepath, get_current_dir_name());
 
-	if(chdir(path)<0){
+	char orig_dir[FD_PATHLEN*2];
+	strcpy(orig_dir, get_current_dir_name());
+
+	if(chdir(config->source)<0){
 		perror("chdir");
 		return -1;
 	}
-
-	sourcepath=get_current_dir_name();
 
 	root=calloc(1,sizeof(struct dirnode));	
 	strcpy(root->path, ".");
 	pathstring[0]='.';
 	dirpointer[dirptrc]=&pathstring[1];
 
-	create_dest_dir(pathstring);
+	create_dest_dir(config, pathstring);
 	
 	node=root;
 
 	do{
-		printf("%s\n", pathstring);
+		config->info(pathstring);
 
-		if(anakin_filewalker(node, node->sub, sourcepath, pathstring, timestamp, excludes)==NULL){ //No more subdirs
+		if((ret=anakin_filewalker(config, node, node->sub, sourcepath, pathstring, timestamp, config->excludes))==0){ //No more subdirs
 
 			next_dir:
 
@@ -97,8 +105,10 @@ int fd_scandir(const char* path, long long timestamp, struct exclude_list *exclu
 			dirptrc--;
 			*dirpointer[dirptrc]='\0';
 
-		}else{ //More subdirs
+		} else if(ret==1) { //More subdirs
 			node=node->sub; //goto subdir
+		} else {
+			return -1;
 		}
 
 		if(chdir(node->path)<0){ //change to new dir
@@ -114,7 +124,7 @@ int fd_scandir(const char* path, long long timestamp, struct exclude_list *exclu
 		dirpointer[dirptrc]=dirpointer[dirptrc-1]+1+strlen(node->path);
 		*dirpointer[dirptrc]='\0';
 		
-		create_dest_dir(pathstring);
+	create_dest_dir(config, pathstring);
 
 	}while(node->top!=NULL);
 	
@@ -127,12 +137,12 @@ int fd_scandir(const char* path, long long timestamp, struct exclude_list *exclu
 }
 
 
-int filter(char *path, char *name, long long timestamp, long long time, struct exclude_list *excludes){
+int filter(char *path, char *name, long long timestamp, long long time, struct frontdown_exclude_list *excludes){
 	if(time>=timestamp)return -1;
 
 	int status;
 	char pathstring[FD_PATHLEN]={0};
-	struct exclude_list *excl_walker;
+	struct frontdown_exclude_list *excl_walker;
 	regex_t re;
 	
 	excl_walker=excludes;
@@ -162,7 +172,7 @@ int filter(char *path, char *name, long long timestamp, long long time, struct e
 	return 0;
 }
 
-struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, const char *source, char *cpath, long long time, struct exclude_list *excludes){		
+int anakin_filewalker(struct frontdown_config *config, struct dirnode *luke, struct dirnode *leia, const char *source, char *cpath, long long time, struct frontdown_exclude_list *excludes){		
 	struct dirent *pwd_ent;
 	struct stat buf;
 	DIR* pwd;
@@ -172,7 +182,8 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, co
 	if((pwd=opendir("."))==NULL){
 		perror("opendir");
 		FilesFailed++;
-		return leia;
+		if(leia==NULL) return 0;
+		return 1;
 	}
 	
 	while((pwd_ent=readdir(pwd))){
@@ -198,8 +209,7 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, co
 
 				if(filter(cpath, pwd_ent->d_name, buf.st_mtime, time, excludes)==0){
 					if(S_ISREG(buf.st_mode)){
-						if(upload(source, cpath, pwd_ent->d_name, buf)==0)
-							fprintf(config.index_db, "%s/%s\n", cpath, pwd_ent->d_name);
+						if(upload(config, source, cpath, pwd_ent->d_name, buf)<-1)return -1;
 					}
 
 					if(S_ISDIR(buf.st_mode)){					
@@ -219,6 +229,7 @@ struct dirnode *anakin_filewalker(struct dirnode *luke, struct dirnode *leia, co
 
 	closedir(pwd);
 	
-	return leia;
+	if(leia==NULL) return 0;
+	return 1;
 }
 

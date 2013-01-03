@@ -1,7 +1,7 @@
-TARGET=frontdown.dll
+TARGET=frontdown-gtk
 OBJS=$(patsubst %.c,%.o,$(wildcard *.c))
 CC=gcc
-CFLAGS+=-D_WIN32_ -std=c99 -L./.dll -mms-bitfields -Id:/Dwimperl/c/include/gtk-2.0 \
+CFLAGS+=-D_WIN32_ -mwindows -std=c99 -L../.dll -mms-bitfields -Id:/Dwimperl/c/include/gtk-2.0 \
 -Id:/Dwimperl/c/lib/gtk-2.0/include -Id:/Dwimperl/c/include/atk-1.0 \
 -Id:/Dwimperl/c/include/cairo -Id:/Dwimperl/c/include/gdk-pixbuf-2.0 \
 -Id:/Dwimperl/c/include/pango-1.0 -Id:/Dwimperl/c/include/glib-2.0 \
@@ -14,7 +14,7 @@ CFLAGS+=-D_WIN32_ -std=c99 -L./.dll -mms-bitfields -Id:/Dwimperl/c/include/gtk-2
 -lgdk-win32-2.0-0 -Wall -g -lregex2 -lcurl -D_GNU_SOURCE 
 
 all: $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -shared -o $(TARGET)
+	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET)
 	
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

@@ -1,6 +1,4 @@
-#ifdef _GUI_
-
-#include "gtkui.h"
+#include "frontdown-gtk.h"
 
 static void enter_callback( GtkWidget *widget,
                             GtkWidget *entry )
@@ -138,7 +136,7 @@ GtkWidget *FrontDownFrame(){
 	return frame;
 }
 
-int gui(void){
+int main(void){
     GtkWidget *window;
     GtkWidget *main_box;
 
@@ -159,10 +157,7 @@ int gui(void){
     
     gtk_widget_show_all (window);
 
-
     gtk_main();
 
     return 0;
 }
-
-#endif

@@ -1,5 +1,5 @@
 #ifdef _WIN32_
-#include "mingw32_fixes.h"
+#include "frontdown_internal.h"
 
 
 char *getpass(){
@@ -21,10 +21,16 @@ char *getpass(){
 
 char *get_current_dir_name(){
 	char *dir;
+	int i;
 	
-   if( (dir = _getcwd( NULL, 0 )) == NULL )
-      perror( "_getcwd error" );
-
+	if( (dir = _getcwd( NULL, 0 )) == NULL )
+		perror( "_getcwd error" );
+	
+	while(dir[i]!='\0'){
+		if(dir[i]=='\\') dir[i]=0x2f;
+		i++;
+	}
+	
 	return dir;
 	
 }

@@ -4,7 +4,6 @@ int frontdown(struct frontdown_config *config){
 	char indexpath[FD_PATHLEN+20];
 	char *dest;
 	char fixbuf[64];
-	char *buf;
 	struct stat statbuf;
 	FILE *index_db;
 	long long last_backup_time;

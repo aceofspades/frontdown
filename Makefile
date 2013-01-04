@@ -14,6 +14,5 @@ clean:
 
 distclean: clean
 	rm -f $(TARGET)
-	rm -f $(TARGET).exe
 	
 new: distclean all

@@ -2,9 +2,11 @@
 #include "frontdown_internal.h"
 
 
-char *getpass(){
-	int i;
+char *getpass(char *out){
+	int i=0;
 	char *ret;
+	
+	printf("%s",out);
 	
 	ret=malloc(1024);
 
@@ -13,8 +15,8 @@ char *getpass(){
 		ret[i] = _getch();
 		i++;
 		if(i==1024)break;
-	} while( ret[i-1] != '\n' );
-	ret[i-1]='0';
+	} while( (ret[i-1] != '\n') && (ret[i-1] != '\r') );
+	ret[i-1]='\0';
 
 	return ret;
 }

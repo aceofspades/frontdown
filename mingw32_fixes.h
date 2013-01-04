@@ -9,10 +9,11 @@
 #include <windows.h>
 #include <direct.h>
 #include <conio.h>
+#include <ctype.h>
 
 #define mkdir(a, b) _mkdir(a)
 
-extern char *getpass();
+extern char *getpass(char *out);
 extern char *get_current_dir_name();
 
 #endif

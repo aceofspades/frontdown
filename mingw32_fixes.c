@@ -17,6 +17,8 @@ char *getpass(char *out){
 		if(i==1024)break;
 	} while( (ret[i-1] != '\n') && (ret[i-1] != '\r') );
 	ret[i-1]='\0';
+	
+	printf("\n");
 
 	return ret;
 }

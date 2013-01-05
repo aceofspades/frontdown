@@ -65,7 +65,7 @@ int create_dest_dir(struct frontdown_config *config, char *relpath){
 		case _FILE_:
 			strcpy(fullpath, &config->destination[7]);
 			strcat(fullpath, &relpath[1]);
-			if((mkdir(fullpath , 0644))!=0){
+			if((mkdir(fullpath , S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH))!=0){
 				if((errno==EEXIST)&&(config->error(_MKDIR_ERROR_, 0, fullpath)==0)){
 					return 0;
 				} else {

@@ -16,3 +16,6 @@ distclean: clean
 	rm -f $(TARGET)
 	
 new: distclean all
+
+install: all
+	cp $(TARGET) /usr/lib/

@@ -138,8 +138,6 @@ int fd_scandir(struct frontdown_config *config, long long timestamp){
 
 
 int filter(char *path, char *name, long long timestamp, long long time, struct frontdown_exclude_list *excludes){
-	if(time>=timestamp)return -1;
-
 	int status;
 	char pathstring[FD_PATHLEN]={0};
 	struct frontdown_exclude_list *excl_walker;
@@ -209,7 +207,9 @@ int anakin_filewalker(struct frontdown_config *config, struct dirnode *luke, str
 
 				if(filter(cpath, pwd_ent->d_name, buf.st_mtime, time, excludes)==0){
 					if(S_ISREG(buf.st_mode)){
-						if(upload(config, source, cpath, pwd_ent->d_name, buf)<-1)return -1;
+						if(time<buf.st_mtime){
+							if(upload(config, source, cpath, pwd_ent->d_name, buf)<-1)return -1;
+						}
 					}
 
 					if(S_ISDIR(buf.st_mode)){					

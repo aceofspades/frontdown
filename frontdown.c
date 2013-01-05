@@ -1,91 +1,66 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <dirent.h>
-#include <time.h>
-#include <sys/stat.h>
+#include "frontdown_internal.h"
 
-#include "frontdown.h"
-#include "scandir.h"
-#include "fd_curl.h"
-#include "communication.h"
+int frontdown(struct frontdown_config *config){
+	char indexpath[FD_PATHLEN+20];
+	char *dest;
+	char fixbuf[64];
+	struct stat statbuf;
+	FILE *index_db;
+	long long last_backup_time;
 
-void version(void){
-	printf("\nFrontdown %s\n", FD_VERSION);
-	#ifdef __GNUC__
-		printf("Compiled: %s %s with gcc %d.%d.%d\n\n", __DATE__, __TIME__, __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
-	#endif
-}
+	config->info("Backup started");
 
-void usage(void){
-	printf("Usage: frontdown [OPTIONS] \n\n");
-	printf("\t-c --conf          Configuration file\n");
-	printf("\t-d --destination   Backup destination\n");
-	printf("\t-e --exclude       File/Folder to exclude as POSIX Extended Regular Expressions\n");
-	printf("\t-h --help          Print this help\n");
-	printf("\t-l                 Destination requires login\n");
-	printf("\t-s --source        Backup source\n");
+	dest=(char*)malloc(FD_PATHLEN+30);
 	
-	printf("\n");
-	printf("There are no bugs - just random features.\n");
-	printf("Mail them to: <nosupport@nowhere.nix>\n\n");
-	printf("(C) Copyright 2012 by Patrick Eigensatz & Florian Wernli\n\n");
-}
-
-
-void help(){
-	version();
-	usage();
-}
-
-int main(int argc, char **argv){
-	// Initialize exclude lists
-	config.excludes = calloc(1, sizeof(struct exclude_list));
-	config.con=-1;
+	strcpy(indexpath, config->destination);
+	strcat(indexpath, "/index.db");
 	
-	latest_exclude = config.excludes;
-	
-	// Parse command line options
-	parse_options(argc, argv);
-	
-	// Display parsed options
-	printf("================================ CONFIG ================================\n");
-	printf("Configuration File:     %s\n", strlen(config.conf)==0?"None":config.conf);
-	printf("Source:                 %s\n", config.source);
-	printf("Destination:            %s\n", config.destination);
-	printf("Last backup:            %s\n", config.last_backup==0?"Never before":ctime((time_t*)&config.last_backup));
-	printf("========================================================================\n\n");
-	
-	
-	// Get index.db
-	char indexpath[16384];
-	char *buf;
-	strcpy(indexpath, config.destination);
-	strcat(indexpath, "index.db");
-	
-	if(config.destinationLogin){
-		printf("To provide maximal security we won't display any character entered!\n\n");
-
-		config.destinationUname=getpass("Destination User: ");
-		buf=malloc(strlen(config.destinationUname));
-		strcpy(buf, config.destinationUname);
-		config.destinationUname=buf;
-
-		config.destinationPwd=getpass("Destination Password: ");			
-		buf=malloc(strlen(config.destinationPwd));
-		strcpy(buf, config.destinationPwd);
-		config.destinationPwd=buf;
-
-		printf("\n\n");
+	if(open_destination(config)==-1){
+		return -1;
 	}
+
+	remove("./index.db");
+	if(config->last_backup > 0){
+		if(get_indexfile(config, indexpath)!=0) return -1;
+		config->last_backup=0;
+		//Read last backup time
+		if((index_db=fopen("./index.db", "rb"))){
+			fscanf(index_db, "%lld", &last_backup_time);
+			config->last_backup=1;
+			fclose(index_db);
+		}
+	}
+
+	//Rewrite index.db
+	index_db=fopen("./index.db", "wb+");
+	rewind(index_db);
+	fprintf(index_db, "%0*lld\n", 15, config->now);
 	
-	get_indexfile(indexpath);
-	
-	create_dest_dir("/");
-	open_destination(config.destination);
-	fd_scandir(config.source, config.last_backup, config.excludes);
+	if(create_dest_dir(config, "/")!=0) return -1;
+
+	sprintf(fixbuf,"/BACKUP%0*lld/", 15, config->now);
+	strcpy(dest, config->destination);
+	strcat(dest, fixbuf);
+
+	free(config->destination);
+	config->destination=dest;
+
+	config->info(config->destination);
+
+	fd_scandir(config, last_backup_time);
+
+	fclose(index_db);
+
+	if(config->last_backup != 0){
+		if(get_indexfile(config, indexpath)!=0) return -1;
+	}
+
+	stat("./index.db", &statbuf);
+	put_file(config, "./index.db", "index.db", indexpath, statbuf.st_size); 
+
 	close_destination();
-	
+
+	remove("./index.db");
+
 	return 0;
 }

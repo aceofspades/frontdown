@@ -73,7 +73,7 @@ int main(int argc, char **argv){
 
 	// Parse command line options (+ file config if specified)
 	if(parse_options(argc, argv)<0){
-		fprintf(stderr,"\nRun '%s --help' for help", argv[0]);
+		fprintf(stderr,"\nRun '%s --help' for help\n", argv[0]);
 		exit(64);
 	}	
 	

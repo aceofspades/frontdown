@@ -19,4 +19,3 @@ new: distclean all
 
 install: all
 	cp $(TARGET) /usr/bin/
-	

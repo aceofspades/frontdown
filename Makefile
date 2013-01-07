@@ -25,3 +25,7 @@ new: distclean all
 install: all
 	cp $(TARGET) /usr/lib/
 	cd frontdown-cli && make install
+
+install_gui: all
+    cp $(TARGET) /usr/lib/
+	cd frontdown-gtk && make install

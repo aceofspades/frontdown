@@ -27,5 +27,5 @@ install: all
 	cd frontdown-cli && make install
 
 install_gui: all
-    cp $(TARGET) /usr/lib/
+	cp $(TARGET) /usr/lib/
 	cd frontdown-gtk && make install

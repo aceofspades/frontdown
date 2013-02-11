@@ -16,12 +16,17 @@ int frontdown(struct frontdown_config *config){
 	strcat(indexpath, "/index.db");
 	
 	if(open_destination(config)==-1){
+		free(dest);
 		return -1;
 	}
 
 	remove("./index.db");
 	if(config->last_backup > 0){
-		if(get_indexfile(config, indexpath)!=0) return -1;
+		if(get_indexfile(config, indexpath)!=0){
+			free(dest);
+			return -1;
+		}
+		
 		config->last_backup=0;
 		//Read last backup time
 		if((index_db=fopen("./index.db", "rb"))){
@@ -36,7 +41,11 @@ int frontdown(struct frontdown_config *config){
 	rewind(index_db);
 	fprintf(index_db, "%0*lld\n", 15, config->now);
 	
-	if(create_dest_dir(config, "/")!=0) return -1;
+	if(create_dest_dir(config, "/")!=0){
+		free(dest);
+		fclose(index_db);
+		return -1;
+	}
 
 	sprintf(fixbuf,"/BACKUP%0*lld/", 15, config->now);
 	strcpy(dest, config->destination);

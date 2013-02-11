@@ -19,10 +19,11 @@ int fileappend(void *buf, size_t size, size_t nmemb, void *stream){
 		
 		if(!out->stream)
 			return -1;
+		
+		return fwrite(buf, size, nmemb, out->stream);
 	}
-	
-	return fwrite(buf, size, nmemb, out->stream);
 }
+
 
 int fileread(void *ptr, int size, int n, void *stream){
 	return (curl_off_t)fread(ptr, size, n, stream);

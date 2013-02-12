@@ -140,6 +140,10 @@ int main(void){
     GtkWidget *window;
     GtkWidget *main_box;
 
+	notify_init("Frontdown");
+	NotifyNotification *notify;
+	GError *notify_error = NULL;
+	
     gtk_init (0, NULL);
 
     /* create a new window */
@@ -158,6 +162,11 @@ int main(void){
     gtk_widget_show_all (window);
 
     gtk_main();
+	
+	notify = notify_notification_new("Frontdown", "Your backup completed successfully!", NULL);
+	notify_notification_show(notify, &notify_error);
+	notify_uninit();
+
 
     return 0;
 }

@@ -50,7 +50,7 @@ int fd_scandir(struct frontdown_config *config, long long timestamp){
 	struct dirnode *node, *root, *freewilli;
 	
 	char sourcepath[FD_PATHLEN*2];
-	strcpy(sourcepath, get_current_dir_name());
+	strcpy(sourcepath, config->source);
 
 	char orig_dir[FD_PATHLEN*2];
 	strcpy(orig_dir, get_current_dir_name());

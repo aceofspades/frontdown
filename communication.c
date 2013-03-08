@@ -125,6 +125,12 @@ int open_destination(struct frontdown_config *config){
 int put_file(struct frontdown_config *config, char *source, char *filename, char *target, curl_off_t size){
 	FILE *handle = fopen(source, "rb");
 	
+	if(handle == NULL){
+		fprintf(stderr, "TMP_DEBUG: %s\n",source);
+		config->error(_PUT_FILE_ERROR_, 1, source);
+		return -2;
+	}
+	
 	char cmd_buffer[strlen(source)+6];
 
 	if(config->con_type==_FTP_){
@@ -132,26 +138,33 @@ int put_file(struct frontdown_config *config, char *source, char *filename, char
 		strcat(cmd_buffer, filename);
 	}
 
-	if(dst_connection.curl && handle != NULL){
+	if(dst_connection.curl){
 		dst_connection.commandlist = curl_slist_append(dst_connection.commandlist, cmd_buffer);
 		curl_easy_setopt(dst_connection.curl, CURLOPT_URL, target);
 		curl_easy_setopt(dst_connection.curl, CURLOPT_UPLOAD, 1);
 		curl_easy_setopt(dst_connection.curl, CURLOPT_POSTQUOTE, dst_connection.commandlist);
 		curl_easy_setopt(dst_connection.curl, CURLOPT_READDATA, handle);
 		curl_easy_setopt(dst_connection.curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)size);
+		curl_easy_setopt(dst_connection.curl, CURLOPT_VERBOSE, 1);
 				
 		dst_connection.result = curl_easy_perform(dst_connection.curl);
-		if(dst_connection.result != CURLE_OK){
-
+		if(dst_connection.result != CURLE_OK)
+		{
 			curl_slist_free_all(dst_connection.commandlist);
 			dst_connection.commandlist=NULL;
 			fclose(handle);
 
 			//modify mtime
 			if((handle=fopen(source, "ab")))
+			{
 				fclose(handle);
+			}
 
-			if(config->error(_PUT_FILE_ERROR_, 0, source)==0) return -1;
+			if(config->error(_PUT_FILE_ERROR_, 0, source)==0)
+			{
+				return -1;
+			}
+			
 			return -2;
 		}
 	}

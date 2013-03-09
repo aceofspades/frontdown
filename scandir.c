@@ -9,14 +9,14 @@ int upload(struct frontdown_config *config, const char *source, char *relpath, c
 	char srcpathstring[FD_PATHLEN*2]={0};
 	char dstpathstring[FD_PATHLEN*2]={0};
 	char ret;
-	int len;
+	int len=-1;
 	
-	strcpy(srcpathstring, source);
-	len=strlen(source);
-	srcpathstring[len]='/';
-	strcpy(&srcpathstring[len+1], relpath);
-	len+=1+strlen(relpath);
-	srcpathstring[len]='/';
+//	strcpy(srcpathstring, source);
+//	len=strlen(source);
+//	srcpathstring[len]='/';
+//	strcpy(&srcpathstring[len+1], relpath);
+//	len+=1+strlen(relpath);
+//	srcpathstring[len]='/';
 	strcpy(&srcpathstring[len+1], name);
 
 	strcpy(dstpathstring, config->destination);

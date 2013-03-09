@@ -126,7 +126,7 @@ int put_file(struct frontdown_config *config, char *source, char *filename, char
 	FILE *handle = fopen(source, "rb");
 	
 	if(handle == NULL){
-		fprintf(stderr, "TMP_DEBUG: %s\n",source);
+//		fprintf(stderr, "TMP_DEBUG: %s\n",source);
 		config->error(_PUT_FILE_ERROR_, 1, source);
 		return -2;
 	}
@@ -145,7 +145,7 @@ int put_file(struct frontdown_config *config, char *source, char *filename, char
 		curl_easy_setopt(dst_connection.curl, CURLOPT_POSTQUOTE, dst_connection.commandlist);
 		curl_easy_setopt(dst_connection.curl, CURLOPT_READDATA, handle);
 		curl_easy_setopt(dst_connection.curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)size);
-		curl_easy_setopt(dst_connection.curl, CURLOPT_VERBOSE, 1);
+		//~ curl_easy_setopt(dst_connection.curl, CURLOPT_VERBOSE, 1);
 				
 		dst_connection.result = curl_easy_perform(dst_connection.curl);
 		if(dst_connection.result != CURLE_OK)

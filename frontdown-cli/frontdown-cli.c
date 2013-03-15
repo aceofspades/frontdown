@@ -23,6 +23,7 @@ void usage(void){
 	printf("\t-h --help          Print this help\n");
 	printf("\t-l --login         Destination requires login\n");
 	printf("\t-s --source        Backup source\n");
+	printf("\t-i --incremental   Only backup what has changed since last time\n");
 	printf("\n");
 	printf("There are no bugs - just random features.\n");
 	printf("Mail them to: <nosupport@nowhere.nix>\n\n");

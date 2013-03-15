@@ -69,6 +69,9 @@ struct frontdown_config{
 	// destinations index.db
 	char last_backup;
 	
+	// Verbose output? (INFO / IGNORE / ...)
+	char verbose;
+	
 	//Unix time
 	long long now;
 };

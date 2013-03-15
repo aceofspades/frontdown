@@ -164,7 +164,9 @@ int filter(char *path, char *name, long long timestamp, long long time, struct f
 			excl_walker=excl_walker->next;
 			continue;
 		}
+		
 		printf("IGNORE: %s MATCH: %s\n", &pathstring[2], excl_walker->exclude_path);
+		
 		return -1;
 	}
 	return 0;

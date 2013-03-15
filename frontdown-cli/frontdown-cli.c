@@ -9,7 +9,7 @@
 #include "frontdown-cli.h"
 
 void version(void){
-	printf("\nFrontdown %s\n", FD_VERSION);
+	printf("Frontdown %s\n", FD_VERSION);
 	#ifdef __GNUC__
 		printf("Compiled: %s %s with gcc %d.%d.%d\n\n", __DATE__, __TIME__, __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 	#endif
@@ -17,14 +17,17 @@ void version(void){
 
 void usage(void){
 	printf("Usage: frontdown [OPTIONS] \n\n");
-	printf("\t-c --conf          Configuration file\n");
-	printf("\t-d --destination   Backup destination\n");
-	printf("\t-e --exclude       File/Folder to exclude as POSIX Extended Regular Expressions\n");
 	printf("\t-h --help          Print this help\n");
-	printf("\t-l --login         Destination requires login\n");
+	printf("\t-v --verbose       Verbose Output\n\n");
+
+	printf("\t-c --conf          Configuration file\n");
+	printf("\t-e --exclude       File/Folder to exclude as POSIX Extended Regular Expressions\n");
+	printf("\t-i --incremental   Only backup what has changed since last time\n\n");
+	
 	printf("\t-s --source        Backup source\n");
-	printf("\t-i --incremental   Only backup what has changed since last time\n");
-	printf("\n");
+	printf("\t-d --destination   Backup destination\n");
+	printf("\t-l --login         Destination requires login\n\n");
+
 	printf("There are no bugs - just random features.\n");
 	printf("Mail them to: <nosupport@nowhere.nix>\n\n");
 	printf("(C) Copyright 2012-2013 by Patrick Eigensatz & Florian Wernli\n\n");
@@ -37,7 +40,9 @@ void help(){
 }
 
 void info(char *text){
-	printf("INFO: %s\n",text);
+	if(config.verbose){
+		printf("INFO: %s\n",text);
+	}
 }
 
 int error(enum frontdown_error_code error_code, char fatal, char *text){
@@ -71,6 +76,7 @@ int main(int argc, char **argv){
 	config.source[0]=0;
 	config.destination[0]=0;
 	config.last_backup=0;
+	config.verbose=0;
 
 	// Parse command line options (+ file config if specified)
 	if(parse_options(argc, argv)<0){
@@ -99,6 +105,7 @@ int main(int argc, char **argv){
 	printf("Source:                 %s\n", config.source);
 	printf("Destination:            %s\n", config.destination);
 	printf("Backuped before:        %s\n", config.last_backup!=0?"yes":"no");
+	printf("Verbose output:         %s\n", config.verbose!=0?"yes":"no");
 	printf("========================================================================\n\n");
 	
 	

@@ -22,6 +22,8 @@ int fileappend(void *buf, size_t size, size_t nmemb, void *stream){
 		
 		return fwrite(buf, size, nmemb, out->stream);
 	}
+	
+	return 0;
 }
 
 

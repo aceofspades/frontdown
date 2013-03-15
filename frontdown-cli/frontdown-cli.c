@@ -36,7 +36,7 @@ void help(){
 	usage();
 }
 
-int info(char *text){
+void info(char *text){
 	printf("INFO: %s\n",text);
 }
 

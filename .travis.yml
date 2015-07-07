@@ -1,3 +1,21 @@
 language: c
 compiler: gcc
-script: make && sudo make install && cd frontdown-cli && make && cd ../frontdown-gtk && make 
+#script: make && sudo make install && cd frontdown-cli && make && cd ../frontdown-gtk && make 
+
+env:
+  global:
+  - PROJECT_NAME="aceofspades/frontdown"
+  - TRAVIS_TEST_RESULT=0
+  - OWNER_EMAIL=nobody@nowhere.com
+  # COVERITY_SCAN_TOKEN via "travis encrypt" using the repo's public key
+  - secure: "Bc3NbRNPQoBr5XLF/4GoMgnYw1D+HAtEr1/RWRUgvumKutVc9ZSxf0gGr+/zUmKTo2SGcn/KGulLp5tSnl5f2o5L3+hZaETMY1wNekkRINNytQ2rQn0JADWPX0pW2yLnLww5tIi6JHc0qPekhbnxbl6blyTS3q3pmY0KYoPvyhqZVpNPZz4OtD+CjBZ2OozrBq+HxzEou7jNDMpZCDGjnVQLoqP9T3Z+niRwcviZGkY/xjftCfuAIVNv7tFGNf3chST6t3+vh9HXqgS7NP9S9KNM4R1qpxpqgYMHpqfQT6XyvLW2PADFa7qi+WgSIJxEU9yf1KeLYlcQIPqbXvUkfcIfFBE1skFG2fgHjgCSBz3NagB0eeynXEBva0q1UkCoPNg3XJJKZif3wESnlw3jiquAv1lASN48K1ZmLEWrcNTj0BeKQrt2NXkXibHS+XNHx7xL3qQH0h5MBHE1yy+J32t3+zkPUxKcdj5tOZvPGtbz3ZZsYyPWJrhj25u7z+mcNDJNbOUJdXtpgLysz45x6SJLmQ4IjVMteCF+QDu0PgWVyXuOAwL+1/Cty2eCu2gHH3Ws86Mhs8p+oRcumwU++xYaHyLpe5csndh6/sjvJhfXrs8w2tMB9/rmA62EPBz+fiTjUkNAKlCE2+Y4PwrZxvz+1k/DpOUaCgM7Lp1KnLs="
+
+addons:
+  coverity_scan:
+    project:
+      name: "aceofspades/frontdown"
+      description: "Your project description here"
+    notification_email: "nobody@example.com"
+    build_command_prepend: ""
+    build_command: "make && sudo make install && cd frontdown-cli && make && cd ../frontdown-gtk && make"
+    branch_pattern: coverity_scan

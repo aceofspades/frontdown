@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE coverity SYSTEM "config.dtd">
+<coverity>
+
+<metrics>
+    <metric>
+        <name>time</name>
+        <value>11</value>
+    </metric>
+    <metric>
+        <name>args</name>
+        <value>cov-build --dir cov-int</value>
+    </metric>
+    <metric>
+        <name>host</name>
+        <value>DRP-MacBook.local</value>
+    </metric>
+    <metric>
+        <name>short-platform</name>
+        <value>macosx</value>
+    </metric>
+    <metric>
+        <name>platform</name>
+        <value>Darwin 13.0.0 x86_64</value>
+    </metric>
+    <metric>
+        <name>ident</name>
+        <value>6.6.1 (build d614fc01a4 p-eureka-push-15003.308)</value>
+    </metric>
+    <metric>
+        <name>user</name>
+        <value>doug</value>
+    </metric>
+    <metric>
+        <name>cwd</name>
+        <value>/Users/doug/Development/Coverity/frontdown</value>
+    </metric>
+    <metric>
+        <name>config</name>
+        <value>/private/tmp/coverity-scan-analysis/cov-analysis-macosx-6.6.1/config/coverity_config.xml</value>
+    </metric>
+    <metric>
+        <name>intermediatedir</name>
+        <value>/Users/doug/Development/Coverity/frontdown/cov-int</value>
+    </metric>
+    <metric>
+        <name>outputdir</name>
+        <value></value>
+    </metric>
+    <metric>
+        <name>emitdir</name>
+        <value></value>
+    </metric>
+    <metric>
+        <name>force</name>
+        <value>no</value>
+    </metric>
+    <metric>
+        <name>cygwin</name>
+        <value>no</value>
+    </metric>
+    <metric>
+        <name>failures</name>
+        <value>0</value>
+    </metric>
+    <metric>
+        <name>successes</name>
+        <value>4</value>
+    </metric>
+    <metric>
+        <name>buildcmd</name>
+        <value>make</value>
+    </metric>
+</metrics>
+</coverity>
